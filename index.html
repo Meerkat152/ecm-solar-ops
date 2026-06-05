@@ -2055,6 +2055,18 @@ const Dashboard = {
 };
 
 // ═══════════════════════════════════════════════════════
+// EXPOSE GLOBALS
+// ═══════════════════════════════════════════════════════
+// const-declared variables at module/script scope are not automatically
+// placed on window in all browsers (notably WebKit/Safari on iOS).
+// Inline onclick handlers need these on window, so assign them explicitly.
+window.App       = App;
+window.Labour    = Labour;
+window.Costs     = Costs;
+window.Dashboard = Dashboard;
+window.Settings  = Settings;
+
+// ═══════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => App.init());
