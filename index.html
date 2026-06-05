@@ -9,458 +9,398 @@
 <meta name="theme-color" content="#1a1a2e">
 <title>Solar Farm Site Ops</title>
 <style>
-  :root {
-    --bg: #0f0f1a;
-    --surface: #1a1a2e;
-    --surface2: #16213e;
-    --accent: #f5a623;
-    --accent2: #e8941a;
-    --green: #27ae60;
-    --red: #e74c3c;
-    --blue: #3498db;
-    --text: #f0f0f0;
-    --text-muted: #9a9ab0;
-    --border: #2a2a45;
-    --radius: 12px;
-    --tab-height: 72px;
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-  }
+:root {
+  --bg:         #0f0f1a;
+  --surface:    #1a1a2e;
+  --surface2:   #16213e;
+  --accent:     #f5a623;
+  --green:      #27ae60;
+  --red:        #e74c3c;
+  --blue:       #3498db;
+  --text:       #f0f0f0;
+  --muted:      #9a9ab0;
+  --border:     #2a2a45;
+  --radius:     12px;
+  --tab-h:      68px;
+  --safe-b:     env(safe-area-inset-bottom, 0px);
+  --safe-t:     env(safe-area-inset-top, 0px);
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    min-height: 100dvh;
-    overflow-x: hidden;
-  }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
 
-  /* ── Layout ── */
-  #app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+/* ── App shell ── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+}
 
-  #header {
-    background: var(--surface);
-    padding: 14px 20px 10px;
-    padding-top: calc(14px + env(safe-area-inset-top, 0px));
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
+#header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: calc(14px + var(--safe-t)) 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 10;
+}
 
-  #header h1 { font-size: 18px; font-weight: 700; color: var(--accent); letter-spacing: 0.3px; }
-  #header .subtitle { font-size: 12px; color: var(--text-muted); }
-  #auth-status { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-  #auth-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
-  #auth-status .dot.connected { background: var(--green); }
+#header h1      { font-size: 18px; font-weight: 700; color: var(--accent); }
+#header .sub    { font-size: 12px; color: var(--muted); margin-top: 1px; }
+#auth-badge     { display: flex; align-items: center; gap: 7px; font-size: 13px; }
+#auth-badge .dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex-shrink: 0;
+}
+#auth-badge .dot.on { background: var(--green); }
 
-  #content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+#content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
-  #tab-bar {
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    flex-shrink: 0;
-    padding-bottom: var(--safe-bottom);
-  }
+/* ── Tab bar ── */
+#tab-bar {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-shrink: 0;
+  padding-bottom: var(--safe-b);
+  z-index: 20;
+}
 
-  .tab-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 10px 4px;
-    border: none;
-    background: none;
-    color: var(--text-muted);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: color 0.15s;
-    min-height: var(--tab-height);
-  }
+.tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  min-height: var(--tab-h);
+  -webkit-appearance: none;
+}
+.tab-btn svg {
+  width: 22px; height: 22px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.tab-btn.active { color: var(--accent); }
 
-  .tab-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .tab-btn.active { color: var(--accent); }
+/* ── Screens ── */
+.screen { display: none; padding: 16px; padding-bottom: 28px; }
+.screen.active { display: block; }
 
-  /* ── Screens ── */
-  .screen { display: none; padding: 16px; padding-bottom: 24px; }
-  .screen.active { display: block; }
+/* ── Cards ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 12px; font-weight: 700;
+  color: var(--muted); text-transform: uppercase;
+  letter-spacing: 0.8px; margin-bottom: 12px;
+}
 
-  /* ── Sign-in card (inline, inside each screen) ── */
-  .signin-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    text-align: center;
-    padding: 40px 24px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-top: 12px;
-  }
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 14px 18px;
+  border-radius: var(--radius); border: none;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer; width: 100%;
+  -webkit-appearance: none;
+  transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.75; }
+.btn-primary   { background: var(--accent); color: #000; }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-success   { background: var(--green); color: #fff; }
+.btn-danger    { background: var(--red); color: #fff; }
+.btn-sm        { padding: 9px 14px; font-size: 13px; width: auto; }
 
-  .signin-card .auth-logo { font-size: 44px; }
-  .signin-card .auth-title { font-size: 18px; font-weight: 700; color: var(--text); }
-  .signin-card .auth-sub { font-size: 13px; color: var(--text-muted); max-width: 280px; line-height: 1.5; }
+/* ── Forms ── */
+.form-group  { margin-bottom: 14px; }
+.form-label  {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--muted); text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 6px;
+}
+.form-input, .form-select {
+  width: 100%; padding: 13px 14px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  font-size: 16px; outline: none;
+  -webkit-appearance: none; appearance: none;
+  transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus { border-color: var(--accent); }
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a9ab0' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
+}
 
-  /* ── Cards ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 12px;
-  }
+/* ── Sign-in card (inline, shown inside each screen when not authed) ── */
+.signin-card {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; text-align: center;
+  padding: 36px 24px; margin-top: 8px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.signin-card .sc-icon { font-size: 44px; }
+.signin-card .sc-title { font-size: 17px; font-weight: 700; }
+.signin-card .sc-sub   { font-size: 13px; color: var(--muted); max-width: 280px; line-height: 1.5; }
+.signin-card .btn      { max-width: 260px; }
 
-  .card-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 12px;
-  }
+/* ── Date nav ── */
+.date-nav {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px; margin-bottom: 14px;
+}
+.date-nav .dn-mid     { flex: 1; text-align: center; }
+.date-nav .dn-main    { font-size: 16px; font-weight: 600; }
+.date-nav .dn-sub     { font-size: 12px; color: var(--muted); }
+.date-nav-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 8px;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.date-nav-btn:active { opacity: 0.7; }
 
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px 20px;
-    border-radius: var(--radius);
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    width: 100%;
-    -webkit-appearance: none;
-  }
+/* ── Worker row ── */
+.worker-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 8px;
+}
+.worker-info      { flex: 1; }
+.worker-name      { font-size: 16px; font-weight: 600; }
+.worker-meta      { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.att-wrap         { display: flex; gap: 6px; }
+.att-btn {
+  width: 52px; height: 44px; border-radius: 8px;
+  border: 2px solid var(--border); background: var(--surface2);
+  color: var(--muted); font-size: 15px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+}
+.att-btn.present  { background: var(--green); border-color: var(--green); color: #fff; }
+.att-btn.absent   { background: var(--red);   border-color: var(--red);   color: #fff; }
 
-  .btn:active { transform: scale(0.97); opacity: 0.85; }
-  .btn-primary { background: var(--accent); color: #000; }
-  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .btn-success { background: var(--green); color: #fff; }
-  .btn-danger { background: var(--red); color: #fff; }
-  .btn-sm { padding: 10px 14px; font-size: 13px; width: auto; }
-  .btn-icon { padding: 12px; width: 48px; height: 48px; }
+/* ── Stats grid ── */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.stat-val  { font-size: 22px; font-weight: 800; color: var(--accent); }
+.stat-lbl  { font-size: 11px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-  /* ── Forms ── */
-  .form-group { margin-bottom: 14px; }
-  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+/* ── Budget bar ── */
+.bbar      { background: var(--surface2); border-radius: 6px; height: 10px; overflow: hidden; margin-top: 8px; }
+.bbar-fill { height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.4s; }
+.bbar-fill.warn   { background: #e67e22; }
+.bbar-fill.danger { background: var(--red); }
 
-  .form-input, .form-select {
-    width: 100%;
-    padding: 14px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-size: 16px;
-    -webkit-appearance: none;
-    appearance: none;
-    outline: none;
-    transition: border-color 0.15s;
-  }
+/* ── Category row ── */
+.cat-row { display: flex; align-items: center; padding: 7px 0; }
+.cat-name { min-width: 130px; font-size: 13px; }
+.cat-bar  { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; margin: 0 10px; overflow: hidden; }
+.cat-bar-fill { height: 100%; background: var(--blue); border-radius: 3px; }
+.cat-amt  { font-size: 13px; font-weight: 600; min-width: 66px; text-align: right; }
 
-  .form-input:focus, .form-select:focus { border-color: var(--accent); }
-  .form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a9ab0' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+/* ── Summary row ── */
+.sum-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 0; border-bottom: 1px solid var(--border);
+}
+.sum-row:last-child { border-bottom: none; }
 
-  /* ── Date Nav ── */
-  .date-nav {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px;
-  }
+/* ── Invoice ── */
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 32px 20px; text-align: center; cursor: pointer;
+  margin-bottom: 14px;
+}
+.upload-zone:active { border-color: var(--accent); }
+.uz-icon { font-size: 40px; margin-bottom: 8px; }
+.uz-head { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.uz-sub  { font-size: 13px; color: var(--muted); }
 
-  .date-nav .date-display { flex: 1; text-align: center; font-size: 16px; font-weight: 600; }
-  .date-nav .date-sub { font-size: 12px; color: var(--text-muted); text-align: center; }
-  .date-nav-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-  .date-nav-btn:active { opacity: 0.7; }
+.inv-preview {
+  background: var(--surface2); border-radius: var(--radius);
+  padding: 12px; margin-bottom: 12px;
+}
+.inv-preview img { width: 100%; border-radius: 8px; max-height: 200px; object-fit: contain; }
 
-  /* ── Worker Row ── */
-  .worker-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 8px;
-  }
+.li-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.li-table th { text-align: left; padding: 7px 8px; color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 600; }
+.li-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); }
 
-  .worker-info { flex: 1; }
-  .worker-name { font-size: 16px; font-weight: 600; }
-  .worker-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+/* ── Spinner / overlay ── */
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  .attendance-toggle {
-    display: flex;
-    gap: 6px;
-  }
+#loading-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.72);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px; z-index: 200;
+}
+#loading-overlay p { font-size: 15px; }
 
-  .att-btn {
-    width: 52px;
-    height: 44px;
-    border-radius: 8px;
-    border: 2px solid var(--border);
-    background: var(--surface2);
-    color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+/* ── Toast ── */
+#toast {
+  position: fixed;
+  bottom: calc(var(--tab-h) + 14px + var(--safe-b));
+  left: 50%; transform: translateX(-50%) translateY(16px);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 24px; padding: 11px 20px;
+  font-size: 14px; font-weight: 600;
+  z-index: 300; opacity: 0; pointer-events: none;
+  white-space: nowrap; max-width: 92vw;
+  transition: opacity 0.2s, transform 0.2s;
+}
+#toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.success { border-color: var(--green); color: var(--green); }
+#toast.error   { border-color: var(--red);   color: var(--red); }
+#toast.info    { border-color: var(--accent); color: var(--accent); }
 
-  .att-btn.present { background: var(--green); border-color: var(--green); color: #fff; }
-  .att-btn.absent { background: var(--red); border-color: var(--red); color: #fff; }
+/* ── Modal ── */
+.modal-back {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.76);
+  display: none; align-items: flex-end; z-index: 100;
+}
+.modal-back.open { display: flex; }
+.modal-box {
+  background: var(--surface); border-radius: 20px 20px 0 0;
+  padding: 20px; padding-bottom: calc(20px + var(--safe-b));
+  width: 100%; max-height: 88vh; overflow-y: auto;
+  border-top: 1px solid var(--border);
+}
+.modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+.modal-title  { font-size: 18px; font-weight: 700; margin-bottom: 18px; }
 
-  /* ── Stats ── */
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
-  .stat-value { font-size: 22px; font-weight: 800; color: var(--accent); }
-  .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+/* ── Misc ── */
+.divider    { height: 1px; background: var(--border); margin: 16px 0; }
+.text-muted { color: var(--muted); font-size: 13px; }
+.text-center { text-align: center; }
+.mt-8  { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.badge       { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.badge-green { background: rgba(39,174,96,0.18); color: var(--green); }
 
-  /* ── Invoice ── */
-  .upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 32px 20px;
-    text-align: center;
-    cursor: pointer;
-    margin-bottom: 16px;
-    transition: border-color 0.15s;
-  }
+.empty-state { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 14px; }
+.empty-icon  { font-size: 38px; margin-bottom: 8px; }
 
-  .upload-zone:active { border-color: var(--accent); }
-  .upload-icon { font-size: 40px; margin-bottom: 8px; }
-  .upload-text { font-size: 14px; color: var(--text-muted); }
-  .upload-text strong { color: var(--text); display: block; font-size: 16px; margin-bottom: 4px; }
+#labour-save-btn { position: sticky; bottom: 14px; margin-top: 14px; z-index: 5; }
 
-  .invoice-preview { background: var(--surface2); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
-  .invoice-preview img { width: 100%; border-radius: 8px; max-height: 200px; object-fit: contain; }
-
-  .line-items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .line-items-table th { text-align: left; padding: 8px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 600; }
-  .line-items-table td { padding: 8px; border-bottom: 1px solid var(--border); }
-
-  /* ── Loading ── */
-  .spinner {
-    width: 32px; height: 32px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loading-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    z-index: 1000;
-  }
-
-  .loading-overlay p { color: var(--text); font-size: 15px; }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed;
-    bottom: calc(var(--tab-height) + 16px + var(--safe-bottom));
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 12px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    z-index: 2000;
-    opacity: 0;
-    transition: opacity 0.2s, transform 0.2s;
-    white-space: nowrap;
-    max-width: 90vw;
-    text-align: center;
-  }
-
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast.success { border-color: var(--green); color: var(--green); }
-  .toast.error { border-color: var(--red); color: var(--red); }
-  .toast.info { border-color: var(--accent); color: var(--accent); }
-
-  /* ── Modal ── */
-  .modal-backdrop {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 500;
-    display: flex;
-    align-items: flex-end;
-  }
-
-  .modal {
-    background: var(--surface);
-    border-radius: 20px 20px 0 0;
-    padding: 20px;
-    padding-bottom: calc(20px + var(--safe-bottom));
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    border-top: 1px solid var(--border);
-  }
-
-  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
-  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-
-  /* ── Dashboard ── */
-  .budget-bar { background: var(--surface2); border-radius: 8px; height: 12px; overflow: hidden; margin-top: 8px; }
-  .budget-bar-fill { height: 100%; background: var(--accent); border-radius: 8px; transition: width 0.5s; }
-  .budget-bar-fill.warning { background: #e67e22; }
-  .budget-bar-fill.danger { background: var(--red); }
-
-  .worker-summary-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
-  .worker-summary-row:last-child { border-bottom: none; }
-
-  .category-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
-  .category-bar { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; margin: 0 12px; overflow: hidden; }
-  .category-bar-fill { height: 100%; background: var(--blue); border-radius: 3px; }
-
-  /* ── Settings ── */
-  .settings-section { margin-bottom: 24px; }
-  .settings-section-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
-
-  /* ── Misc ── */
-  .divider { height: 1px; background: var(--border); margin: 16px 0; }
-  .text-center { text-align: center; }
-  .text-muted { color: var(--text-muted); font-size: 13px; }
-  .mt-8 { margin-top: 8px; }
-  .mt-12 { margin-top: 12px; }
-  .mt-16 { margin-top: 16px; }
-  .flex { display: flex; }
-  .flex-between { display: flex; align-items: center; justify-content: space-between; }
-  .gap-8 { gap: 8px; }
-  .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
-  .badge-green { background: rgba(39,174,96,0.2); color: var(--green); }
-  .badge-red { background: rgba(231,76,60,0.2); color: var(--red); }
-  .badge-yellow { background: rgba(245,166,35,0.2); color: var(--accent); }
-
-  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
-  .empty-icon { font-size: 40px; margin-bottom: 8px; }
-
-  #labour-save-btn { position: sticky; bottom: 16px; margin-top: 16px; z-index: 10; }
-
-  .worker-earn { text-align: right; flex-shrink: 0; }
-  .worker-earn .days { font-size: 12px; color: var(--text-muted); }
-  .worker-earn .total { font-size: 15px; font-weight: 700; color: var(--accent); }
+.settings-section-title {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
+}
+.settings-section { margin-bottom: 24px; }
 </style>
 </head>
 <body>
 <div id="app">
+
+  <!-- Header -->
   <div id="header">
     <div>
-      <h1>⚡ Solar Ops</h1>
-      <div class="subtitle" id="project-name-display">ECM Solar Farm</div>
+      <h1>&#9889; Solar Ops</h1>
+      <div class="sub" id="proj-name">ECM Solar Farm</div>
     </div>
-    <div id="auth-status">
+    <div id="auth-badge">
       <div class="dot" id="auth-dot"></div>
       <span id="auth-label">Not signed in</span>
     </div>
   </div>
 
+  <!-- Scrollable content -->
   <div id="content">
-    <!-- Labour Screen -->
+
+    <!-- LABOUR -->
     <div id="screen-labour" class="screen">
       <div class="date-nav">
         <button class="date-nav-btn" onclick="Labour.prevDay()">
           <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <div>
-          <div class="date-display" id="labour-date-display">—</div>
-          <div class="date-sub" id="labour-date-sub">—</div>
+        <div class="dn-mid">
+          <div class="dn-main" id="labour-date-main">—</div>
+          <div class="dn-sub"  id="labour-date-sub">—</div>
         </div>
-        <button class="date-nav-btn" onclick="Labour.nextDay()" id="labour-next-btn">
+        <button class="date-nav-btn" id="labour-next-btn" onclick="Labour.nextDay()">
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
-
-      <div id="labour-worker-list">
-        <div class="empty-state">
-          <div class="empty-icon">👷</div>
-          Loading workers…
-        </div>
-      </div>
-
-      <button class="btn btn-primary" id="labour-save-btn" onclick="Labour.saveAttendance()" style="display:none">
+      <div id="labour-list"></div>
+      <button class="btn btn-primary" id="labour-save-btn" style="display:none" onclick="Labour.save()">
         Save Attendance
       </button>
-
       <div class="divider"></div>
-
-      <button class="btn btn-secondary" onclick="Labour.showAddWorker()">
-        + Add New Worker
-      </button>
-
+      <button class="btn btn-secondary" onclick="Labour.showAddWorker()">+ Add New Worker</button>
       <div class="divider"></div>
-
-      <div class="card" id="labour-weekly-summary" style="display:none">
+      <div id="labour-totals-card" class="card" style="display:none">
         <div class="card-title">Worker Totals (All Time)</div>
-        <div id="labour-totals-list"></div>
+        <div id="labour-totals"></div>
       </div>
     </div>
 
-    <!-- Costs Screen -->
+    <!-- COSTS -->
     <div id="screen-costs" class="screen">
-      <div class="flex-between" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div>
           <div style="font-size:18px;font-weight:700">Invoice Scanner</div>
           <div class="text-muted">Capture &amp; log invoices</div>
         </div>
         <button class="btn btn-sm btn-secondary" onclick="Costs.showHistory()">History</button>
       </div>
-
-      <div id="costs-main-view">
-        <div class="upload-zone" onclick="Costs.triggerUpload()" id="upload-zone">
-          <div class="upload-icon">📄</div>
-          <div class="upload-text">
-            <strong>Scan Invoice</strong>
-            Tap to take photo or choose file
-          </div>
+      <div id="costs-body">
+        <div class="upload-zone" id="upload-zone" onclick="Costs.triggerUpload()">
+          <div class="uz-icon">&#128196;</div>
+          <div class="uz-head">Scan Invoice</div>
+          <div class="uz-sub">Tap to photograph or choose file</div>
         </div>
-        <input type="file" id="invoice-file-input" accept="image/*,application/pdf" capture="environment" style="display:none" onchange="Costs.handleFile(event)">
-
-        <div id="costs-extraction-area" style="display:none">
-          <div id="invoice-preview-container" class="invoice-preview" style="display:none"></div>
-
-          <div id="extraction-loading" style="display:none;text-align:center;padding:24px">
+        <input type="file" id="inv-file" accept="image/*,application/pdf" capture="environment"
+               style="display:none" onchange="Costs.handleFile(event)">
+        <div id="costs-extract" style="display:none">
+          <div id="inv-preview" class="inv-preview" style="display:none"></div>
+          <div id="extract-loading" style="display:none;text-align:center;padding:24px">
             <div class="spinner"></div>
-            <p style="margin-top:12px;color:var(--text-muted);font-size:14px">Reading invoice with AI…</p>
+            <p style="margin-top:12px;color:var(--muted);font-size:14px">Reading invoice with AI&#8230;</p>
           </div>
-
-          <div id="extraction-form" style="display:none">
+          <div id="extract-form" style="display:none">
             <div class="card">
-              <div class="card-title">Extracted Details — Review &amp; Edit</div>
+              <div class="card-title">Review &amp; Edit — then confirm</div>
               <div class="form-group">
                 <label class="form-label">Supplier</label>
                 <input type="text" id="inv-supplier" class="form-input" placeholder="Supplier name">
@@ -474,105 +414,76 @@
                 <input type="date" id="inv-date" class="form-input">
               </div>
               <div class="form-group">
-                <label class="form-label">Total Amount (£)</label>
+                <label class="form-label">Total Amount (&#163;)</label>
                 <input type="number" id="inv-total" class="form-input" step="0.01" placeholder="0.00">
               </div>
               <div class="form-group">
-                <label class="form-label">VAT Amount (£)</label>
+                <label class="form-label">VAT Amount (&#163;)</label>
                 <input type="number" id="inv-vat" class="form-input" step="0.01" placeholder="0.00">
               </div>
               <div class="form-group">
                 <label class="form-label">Category</label>
-                <select id="inv-category" class="form-select">
-                  <option value="Materials">Materials</option>
-                  <option value="Electrical Equipment">Electrical Equipment</option>
-                  <option value="Mechanical Equipment">Mechanical Equipment</option>
-                  <option value="Transport">Transport</option>
-                  <option value="Subcontractors">Subcontractors</option>
-                  <option value="Labour">Labour</option>
-                  <option value="Other">Other</option>
+                <select id="inv-cat" class="form-select">
+                  <option>Materials</option>
+                  <option>Electrical Equipment</option>
+                  <option>Mechanical Equipment</option>
+                  <option>Transport</option>
+                  <option>Subcontractors</option>
+                  <option>Labour</option>
+                  <option>Other</option>
                 </select>
               </div>
               <div class="form-group">
                 <label class="form-label">Notes</label>
-                <input type="text" id="inv-notes" class="form-input" placeholder="Optional notes">
+                <input type="text" id="inv-notes" class="form-input" placeholder="Optional">
               </div>
-
-              <div id="line-items-section" style="display:none">
-                <div class="card-title" style="margin-top:12px">Line Items</div>
-                <div id="line-items-container"></div>
+              <div id="inv-lineitems" style="display:none">
+                <div class="card-title" style="margin-top:10px">Line Items</div>
+                <div id="inv-li-body"></div>
               </div>
             </div>
-
             <button class="btn btn-success" onclick="Costs.confirmSave()" style="margin-bottom:8px">
-              ✓ Confirm &amp; Save to Sheet
+              &#10003; Confirm &amp; Save to Sheet
             </button>
-            <button class="btn btn-secondary" onclick="Costs.reset()">
-              ✗ Cancel
-            </button>
+            <button class="btn btn-secondary" onclick="Costs.reset()">&#10005; Cancel</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Dashboard Screen -->
+    <!-- DASHBOARD -->
     <div id="screen-dashboard" class="screen">
-      <div style="margin-bottom:16px">
-        <div style="font-size:18px;font-weight:700">Project Dashboard</div>
-        <div class="text-muted" id="dashboard-updated">Pull down to refresh</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:18px;font-weight:700">Dashboard</div>
+        <div class="text-muted" id="dash-updated" style="font-size:12px">—</div>
       </div>
-
       <div class="stat-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="dash-total-spend">—</div>
-          <div class="stat-label">Total Spend</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="dash-labour-cost">—</div>
-          <div class="stat-label">Labour Cost</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="dash-days">—</div>
-          <div class="stat-label">Working Days</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="dash-workers">—</div>
-          <div class="stat-label">Active Workers</div>
-        </div>
+        <div class="stat-card"><div class="stat-val" id="ds-spend">—</div><div class="stat-lbl">Total Spend</div></div>
+        <div class="stat-card"><div class="stat-val" id="ds-labour">—</div><div class="stat-lbl">Labour Cost</div></div>
+        <div class="stat-card"><div class="stat-val" id="ds-days">—</div><div class="stat-lbl">Working Days</div></div>
+        <div class="stat-card"><div class="stat-val" id="ds-workers">—</div><div class="stat-lbl">Active Workers</div></div>
       </div>
-
-      <div class="card" id="budget-card" style="display:none">
+      <div id="ds-budget-card" class="card" style="display:none">
         <div class="card-title">Budget</div>
-        <div class="flex-between">
-          <span id="dash-budget-spent">—</span>
-          <span style="color:var(--text-muted);font-size:13px">of <span id="dash-budget-total">—</span></span>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span id="ds-bspent">—</span>
+          <span class="text-muted">of <span id="ds-btotal">—</span></span>
         </div>
-        <div class="budget-bar mt-8">
-          <div class="budget-bar-fill" id="budget-bar-fill" style="width:0%"></div>
-        </div>
-        <div class="text-muted mt-8" id="dash-budget-remaining">—</div>
+        <div class="bbar mt-8"><div class="bbar-fill" id="ds-bbar" style="width:0%"></div></div>
+        <div class="text-muted mt-8" id="ds-brem">—</div>
       </div>
-
       <div class="card">
         <div class="card-title">Spend by Category</div>
-        <div id="dash-categories">
-          <div class="text-muted" style="padding:8px 0">No cost data yet</div>
-        </div>
+        <div id="ds-cats"><div class="text-muted">No data yet</div></div>
       </div>
-
       <div class="card">
         <div class="card-title">Worker Summary</div>
-        <div id="dash-workers-list">
-          <div class="text-muted" style="padding:8px 0">No labour data yet</div>
-        </div>
+        <div id="ds-wsummary"><div class="text-muted">No data yet</div></div>
       </div>
-
-      <button class="btn btn-secondary" onclick="Dashboard.load()" style="margin-top:8px">
-        ↻ Refresh Dashboard
-      </button>
+      <button class="btn btn-secondary" onclick="Dashboard.load()" style="margin-top:4px">&#8635; Refresh</button>
     </div>
 
-    <!-- Settings Screen -->
+    <!-- SETTINGS -->
     <div id="screen-settings" class="screen">
       <div style="font-size:18px;font-weight:700;margin-bottom:20px">Settings</div>
 
@@ -580,36 +491,39 @@
         <div class="settings-section-title">Google Account</div>
         <div class="form-group">
           <label class="form-label">Google OAuth Client ID</label>
-          <input type="text" id="settings-client-id" class="form-input" placeholder="xxxxxxxxxxxx.apps.googleusercontent.com" autocomplete="off">
-          <p class="text-muted" style="margin-top:6px">From Google Cloud Console → APIs &amp; Services → Credentials</p>
+          <input type="text" id="s-client-id" class="form-input"
+                 placeholder="xxxxxxxxx.apps.googleusercontent.com" autocomplete="off">
+          <p class="text-muted" style="margin-top:6px">
+            Get this from Google Cloud Console &#8594; APIs &amp; Services &#8594; Credentials
+          </p>
         </div>
-        <div id="settings-auth-info" class="card" style="margin-bottom:12px">
+        <div id="s-auth-info" class="card" style="margin-bottom:12px">
           <div class="text-muted">Not signed in</div>
         </div>
-        <button class="btn btn-secondary" id="settings-auth-btn" onclick="App.signIn()">Sign in with Google</button>
+        <button class="btn btn-secondary" id="s-auth-btn" onclick="App.signIn()">Sign in with Google</button>
       </div>
 
       <div class="settings-section">
         <div class="settings-section-title">Project Config</div>
         <div class="form-group">
           <label class="form-label">Google Sheet ID</label>
-          <input type="text" id="settings-sheet-id" class="form-input" placeholder="Paste Sheet ID from URL">
+          <input type="text" id="s-sheet-id" class="form-input" placeholder="Paste Sheet ID from the URL">
         </div>
         <div class="form-group">
           <label class="form-label">Google Drive Folder ID</label>
-          <input type="text" id="settings-folder-id" class="form-input" placeholder="Folder ID for invoice storage">
+          <input type="text" id="s-folder-id" class="form-input" placeholder="Folder ID for invoice storage">
         </div>
         <div class="form-group">
           <label class="form-label">Project Name</label>
-          <input type="text" id="settings-project-name" class="form-input" placeholder="ECM Solar Farm">
+          <input type="text" id="s-proj-name" class="form-input" placeholder="ECM Solar Farm">
         </div>
         <div class="form-group">
-          <label class="form-label">Project Budget (£, optional)</label>
-          <input type="number" id="settings-budget" class="form-input" placeholder="e.g. 500000">
+          <label class="form-label">Project Budget (&#163;, optional)</label>
+          <input type="number" id="s-budget" class="form-input" placeholder="e.g. 500000">
         </div>
         <div class="form-group">
-          <label class="form-label">Default Daily Labour Rate (£)</label>
-          <input type="number" id="settings-daily-rate" class="form-input" placeholder="e.g. 180">
+          <label class="form-label">Default Daily Labour Rate (&#163;)</label>
+          <input type="number" id="s-rate" class="form-input" placeholder="e.g. 180">
         </div>
       </div>
 
@@ -617,9 +531,11 @@
         <div class="settings-section-title">Anthropic API (Invoice Scanning)</div>
         <div class="form-group">
           <label class="form-label">API Key</label>
-          <input type="password" id="settings-api-key" class="form-input" placeholder="sk-ant-…" autocomplete="off">
+          <input type="password" id="s-api-key" class="form-input" placeholder="sk-ant-&#8230;" autocomplete="off">
         </div>
-        <p class="text-muted" style="margin-bottom:12px">Used only for invoice scanning via Claude Vision. Stored locally on this device.</p>
+        <p class="text-muted" style="margin-bottom:12px">
+          Used only for invoice scanning. Stored locally on this device only.
+        </p>
       </div>
 
       <button class="btn btn-primary" onclick="Settings.save()">Save Settings</button>
@@ -628,7 +544,9 @@
 
       <div class="settings-section">
         <div class="settings-section-title">Sheet Setup</div>
-        <p class="text-muted" style="margin-bottom:12px">First time? Create the required tabs and headers in your Google Sheet automatically.</p>
+        <p class="text-muted" style="margin-bottom:12px">
+          First time? Automatically create the required tabs and headers in your Google Sheet.
+        </p>
         <button class="btn btn-secondary" onclick="Settings.initSheet()">Initialise Google Sheet</button>
       </div>
 
@@ -636,1066 +554,851 @@
 
       <div class="settings-section">
         <div class="settings-section-title">Danger Zone</div>
-        <button class="btn btn-danger" onclick="Settings.signOut()">Sign Out</button>
+        <button class="btn btn-danger" onclick="Settings.signOut()">Sign Out of Google</button>
       </div>
 
-      <p class="text-muted text-center mt-12" style="font-size:11px">Solar Ops v1.0 · ECM Solar Farm</p>
+      <p class="text-muted text-center" style="font-size:11px;margin-top:12px">Solar Ops v1.0</p>
     </div>
-  </div>
 
-  <!-- Tab Bar -->
+  </div><!-- /#content -->
+
+  <!-- Tab bar -->
   <div id="tab-bar">
-    <button class="tab-btn active" id="tab-labour" onclick="App.switchTab('labour')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/></svg>
+    <button class="tab-btn" id="tab-labour"    onclick="App.switchTab('labour')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       LABOUR
     </button>
-    <button class="tab-btn" id="tab-costs" onclick="App.switchTab('costs')">
-      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <button class="tab-btn" id="tab-costs"     onclick="App.switchTab('costs')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       COSTS
     </button>
     <button class="tab-btn" id="tab-dashboard" onclick="App.switchTab('dashboard')">
       <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       DASHBOARD
     </button>
-    <button class="tab-btn" id="tab-settings" onclick="App.switchTab('settings')">
+    <button class="tab-btn" id="tab-settings"  onclick="App.switchTab('settings')">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       SETTINGS
     </button>
   </div>
-</div>
 
-<!-- Loading Overlay -->
-<div id="loading-overlay" class="loading-overlay" style="display:none">
+</div><!-- /#app -->
+
+<!-- Loading overlay -->
+<div id="loading-overlay">
   <div class="spinner"></div>
-  <p id="loading-text">Loading…</p>
+  <p id="loading-text">Loading&#8230;</p>
 </div>
 
 <!-- Toast -->
-<div id="toast" class="toast"></div>
+<div id="toast"></div>
 
-<!-- Modals -->
-<div id="modal-add-worker" class="modal-backdrop" style="display:none" onclick="if(event.target===this)App.closeModal('modal-add-worker')">
-  <div class="modal">
+<!-- Add Worker modal -->
+<div id="modal-add-worker" class="modal-back" onclick="if(event.target===this)App.closeModal('modal-add-worker')">
+  <div class="modal-box">
     <div class="modal-handle"></div>
     <div class="modal-title">Add New Worker</div>
     <div class="form-group">
       <label class="form-label">Full Name</label>
-      <input type="text" id="new-worker-name" class="form-input" placeholder="e.g. John Smith">
+      <input type="text" id="nw-name" class="form-input" placeholder="e.g. John Smith">
     </div>
     <div class="form-group">
       <label class="form-label">Start Date</label>
-      <input type="date" id="new-worker-date" class="form-input">
+      <input type="date" id="nw-date" class="form-input">
     </div>
     <div class="form-group">
-      <label class="form-label">Daily Rate (£, leave blank for default)</label>
-      <input type="number" id="new-worker-rate" class="form-input" placeholder="Leave blank for default">
+      <label class="form-label">Daily Rate (&#163;) — leave blank for default</label>
+      <input type="number" id="nw-rate" class="form-input" placeholder="Leave blank for default">
     </div>
     <button class="btn btn-primary" onclick="Labour.addWorker()" style="margin-bottom:8px">Add Worker</button>
     <button class="btn btn-secondary" onclick="App.closeModal('modal-add-worker')">Cancel</button>
   </div>
 </div>
 
-<div id="modal-costs-history" class="modal-backdrop" style="display:none" onclick="if(event.target===this)App.closeModal('modal-costs-history')">
-  <div class="modal">
+<!-- Invoice history modal -->
+<div id="modal-history" class="modal-back" onclick="if(event.target===this)App.closeModal('modal-history')">
+  <div class="modal-box">
     <div class="modal-handle"></div>
     <div class="modal-title">Recent Invoices</div>
-    <div id="costs-history-list">Loading…</div>
-    <button class="btn btn-secondary" onclick="App.closeModal('modal-costs-history')" style="margin-top:12px">Close</button>
+    <div id="history-list"></div>
+    <button class="btn btn-secondary" onclick="App.closeModal('modal-history')" style="margin-top:12px">Close</button>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// CONFIGURATION
-// ═══════════════════════════════════════════════════════
-const GOOGLE_CLIENT_ID = ''; // Set in Settings
-const SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive';
-const DISCOVERY_DOCS = [
-  'https://sheets.googleapis.com/$discovery/rest?version=v4',
-  'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'
-];
-
-// ═══════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
 // STATE
-// ═══════════════════════════════════════════════════════
-const State = {
+// ─────────────────────────────────────────────────────────────
+var State = {
   isSignedIn: false,
-  accessToken: null,
-  tokenExpiry: null,
-  settings: {},
-  currentTab: 'labour',
+  token: null,
+  tokenExpiry: 0,
+  cfg: {},
 
-  load() {
-    try {
-      this.settings = JSON.parse(localStorage.getItem('solar_settings') || '{}');
-    } catch(e) {
-      this.settings = {};
-    }
-    const tokenData = JSON.parse(localStorage.getItem('solar_token') || 'null');
-    if (tokenData && tokenData.expiry > Date.now()) {
-      this.accessToken = tokenData.token;
-      this.tokenExpiry = tokenData.expiry;
+  load: function () {
+    try { this.cfg = JSON.parse(localStorage.getItem('solar_cfg') || '{}'); }
+    catch (e) { this.cfg = {}; }
+    var td = JSON.parse(localStorage.getItem('solar_token') || 'null');
+    if (td && td.expiry > Date.now()) {
+      this.token = td.token;
+      this.tokenExpiry = td.expiry;
       this.isSignedIn = true;
     }
   },
 
-  saveSettings() {
-    localStorage.setItem('solar_settings', JSON.stringify(this.settings));
-  },
-
-  saveToken(token, expiresIn) {
-    const expiry = Date.now() + (expiresIn - 60) * 1000;
-    this.accessToken = token;
+  saveToken: function (token, expiresIn) {
+    var expiry = Date.now() + (expiresIn - 60) * 1000;
+    this.token = token;
     this.tokenExpiry = expiry;
     this.isSignedIn = true;
-    localStorage.setItem('solar_token', JSON.stringify({ token, expiry }));
+    localStorage.setItem('solar_token', JSON.stringify({ token: token, expiry: expiry }));
   },
 
-  clearToken() {
-    this.accessToken = null;
-    this.tokenExpiry = null;
+  clearToken: function () {
+    this.token = null;
+    this.tokenExpiry = 0;
     this.isSignedIn = false;
     localStorage.removeItem('solar_token');
   },
 
-  get(key, defaultVal = '') {
-    return this.settings[key] !== undefined ? this.settings[key] : defaultVal;
+  saveCfg: function () {
+    localStorage.setItem('solar_cfg', JSON.stringify(this.cfg));
   },
-  set(key, val) {
-    this.settings[key] = val;
-  }
+
+  get: function (k, def) {
+    var v = this.cfg[k];
+    return (v !== undefined && v !== null) ? v : (def !== undefined ? def : '');
+  },
+
+  set: function (k, v) { this.cfg[k] = v; }
 };
 
-// ═══════════════════════════════════════════════════════
-// GOOGLE API
-// ═══════════════════════════════════════════════════════
-const GApi = {
-  async request(method, url, body = null) {
-    if (!State.accessToken) throw new Error('Not authenticated');
-
-    // Token refresh check
-    if (State.tokenExpiry && Date.now() > State.tokenExpiry - 30000) {
-      App.showToast('Session expired — please sign in again', 'error');
-      App.handleSignOut();
-      throw new Error('Token expired');
+// ─────────────────────────────────────────────────────────────
+// GOOGLE API HELPERS
+// ─────────────────────────────────────────────────────────────
+var GApi = {
+  _checkToken: function () {
+    if (!State.isSignedIn || !State.token) throw new Error('Not signed in');
+    if (Date.now() > State.tokenExpiry - 30000) {
+      State.clearToken();
+      App.updateAuthUI();
+      throw new Error('Session expired — please sign in again');
     }
+  },
 
-    const opts = {
-      method,
+  request: function (method, url, body) {
+    this._checkToken();
+    var opts = {
+      method: method,
       headers: {
-        'Authorization': `Bearer ${State.accessToken}`,
+        'Authorization': 'Bearer ' + State.token,
         'Content-Type': 'application/json'
       }
     };
     if (body) opts.body = JSON.stringify(body);
-
-    const res = await fetch(url, opts);
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: { message: res.statusText } }));
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
-    }
-    return res.json();
-  },
-
-  async getSheet(sheetId, range) {
-    return this.request('GET',
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}`
-    );
-  },
-
-  async appendSheet(sheetId, range, values) {
-    return this.request('POST',
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
-      { values }
-    );
-  },
-
-  async updateSheet(sheetId, range, values) {
-    return this.request('PUT',
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`,
-      { values }
-    );
-  },
-
-  async batchUpdate(sheetId, requests) {
-    return this.request('POST',
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`,
-      { requests }
-    );
-  },
-
-  async getSheetMeta(sheetId) {
-    return this.request('GET',
-      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties`
-    );
-  },
-
-  async uploadFileToDrive(folderId, fileName, blob, mimeType) {
-    if (!State.accessToken) throw new Error('Not authenticated');
-
-    const metadata = {
-      name: fileName,
-      parents: [folderId]
-    };
-
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    form.append('file', blob, fileName);
-
-    const res = await fetch(
-      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
-      {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${State.accessToken}` },
-        body: form
+    return fetch(url, opts).then(function (r) {
+      if (!r.ok) {
+        return r.json().catch(function () { return { error: { message: r.statusText } }; })
+          .then(function (e) { throw new Error((e.error && e.error.message) || ('HTTP ' + r.status)); });
       }
-    );
-    if (!res.ok) throw new Error(`Drive upload failed: ${res.statusText}`);
-    return res.json();
+      return r.json();
+    });
+  },
+
+  getRange: function (sheetId, range) {
+    return this.request('GET',
+      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId +
+      '/values/' + encodeURIComponent(range));
+  },
+
+  appendRows: function (sheetId, range, values) {
+    return this.request('POST',
+      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId +
+      '/values/' + encodeURIComponent(range) +
+      ':append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
+      { values: values });
+  },
+
+  updateRange: function (sheetId, range, values) {
+    return this.request('PUT',
+      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId +
+      '/values/' + encodeURIComponent(range) +
+      '?valueInputOption=USER_ENTERED',
+      { values: values });
+  },
+
+  batchUpdate: function (sheetId, requests) {
+    return this.request('POST',
+      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId + ':batchUpdate',
+      { requests: requests });
+  },
+
+  getMeta: function (sheetId) {
+    return this.request('GET',
+      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId +
+      '?fields=sheets.properties');
+  },
+
+  uploadToDrive: function (folderId, fileName, blob, mimeType) {
+    this._checkToken();
+    var meta = JSON.stringify({ name: fileName, parents: [folderId] });
+    var form = new FormData();
+    form.append('metadata', new Blob([meta], { type: 'application/json' }));
+    form.append('file', blob, fileName);
+    return fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+      { method: 'POST', headers: { 'Authorization': 'Bearer ' + State.token }, body: form }
+    ).then(function (r) {
+      if (!r.ok) throw new Error('Drive upload failed: ' + r.statusText);
+      return r.json();
+    });
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// OAUTH (Implicit Flow via popup)
-// ═══════════════════════════════════════════════════════
-const OAuth = {
-  popup: null,
-  resolve: null,
-  reject: null,
+// ─────────────────────────────────────────────────────────────
+// OAUTH  (implicit flow — popup then fallback redirect)
+// ─────────────────────────────────────────────────────────────
+var OAuth = {
+  SCOPES: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive',
 
-  signIn() {
-    const clientId = State.get('clientId');
+  handleRedirect: function () {
+    var hash = window.location.hash;
+    if (!hash || hash.indexOf('access_token') === -1) return false;
+    var p = new URLSearchParams(hash.slice(1));
+    var token = p.get('access_token');
+    var exp   = parseInt(p.get('expires_in') || '3600', 10);
+    if (token) {
+      State.saveToken(token, exp);
+      window.history.replaceState(null, '', window.location.pathname);
+      return true;
+    }
+    return false;
+  },
+
+  signIn: function () {
+    var clientId = State.get('clientId');
     if (!clientId) {
-      App.showToast('Enter your Google Client ID in Settings first', 'error');
+      App.toast('Enter your Google Client ID in Settings first', 'error');
       App.switchTab('settings');
       return Promise.reject(new Error('no_client_id'));
     }
-
-    const redirectUri = window.location.origin + window.location.pathname;
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      response_type: 'token',
-      scope: SCOPES,
+    var redirectUri = window.location.origin + window.location.pathname;
+    var params = new URLSearchParams({
+      client_id:              clientId,
+      redirect_uri:           redirectUri,
+      response_type:          'token',
+      scope:                  this.SCOPES,
       include_granted_scopes: 'true',
-      prompt: 'consent'
+      prompt:                 'consent'
     });
+    var url = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
 
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
-
-    return new Promise((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
-
-      // Open popup for OAuth
-      this.popup = window.open(url, 'oauth', 'width=500,height=600,scrollbars=yes');
-
-      if (!this.popup || this.popup.closed) {
-        // Fallback: redirect same window
-        sessionStorage.setItem('oauth_return_tab', State.currentTab);
+    return new Promise(function (resolve, reject) {
+      var popup = window.open(url, 'oauth_popup', 'width=520,height=620,scrollbars=yes');
+      if (!popup || popup.closed) {
+        sessionStorage.setItem('oauth_return', App.currentTab);
         window.location.href = url;
-        reject(new Error('popup blocked'));
+        reject(new Error('popup_blocked'));
         return;
       }
-
-      const timer = setInterval(() => {
+      var timer = setInterval(function () {
         try {
-          if (this.popup.closed) {
+          if (popup.closed) {
             clearInterval(timer);
-            reject(new Error('OAuth popup closed'));
-            this.popup = null;
+            reject(new Error('popup_closed'));
+            return;
           }
-          const hash = this.popup.location.hash;
-          if (hash && hash.includes('access_token')) {
+          var h = popup.location.hash;
+          if (h && h.indexOf('access_token') !== -1) {
             clearInterval(timer);
-            const params = new URLSearchParams(hash.slice(1));
-            const token = params.get('access_token');
-            const expiresIn = parseInt(params.get('expires_in') || '3600');
-            this.popup.close();
-            this.popup = null;
-            resolve({ token, expiresIn });
+            var ps = new URLSearchParams(h.slice(1));
+            var tok = ps.get('access_token');
+            var exp = parseInt(ps.get('expires_in') || '3600', 10);
+            popup.close();
+            resolve({ token: tok, expiresIn: exp });
           }
-        } catch(e) {
-          // Cross-origin — still loading
-        }
+        } catch (e) { /* cross-origin during load — ignore */ }
       }, 300);
     });
-  },
-
-  handleRedirectToken() {
-    // Handle implicit flow redirect back to this page
-    const hash = window.location.hash;
-    if (hash && hash.includes('access_token')) {
-      const params = new URLSearchParams(hash.slice(1));
-      const token = params.get('access_token');
-      const expiresIn = parseInt(params.get('expires_in') || '3600');
-      if (token) {
-        State.saveToken(token, expiresIn);
-        window.history.replaceState(null, '', window.location.pathname);
-        return true;
-      }
-    }
-    return false;
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// APP CORE
-// ═══════════════════════════════════════════════════════
-const App = {
+// ─────────────────────────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────────────────────────
+function signinCard(featureName) {
+  var hasId = !!State.get('clientId');
+  return '<div class="signin-card">' +
+    '<div class="sc-icon">&#128274;</div>' +
+    '<div class="sc-title">Sign in required</div>' +
+    '<div class="sc-sub">' +
+      (hasId
+        ? 'Sign in with Google to use ' + esc(featureName) + '.'
+        : 'Add your Google Client ID in Settings, then sign in.') +
+    '</div>' +
+    (hasId
+      ? '<button class="btn btn-primary" onclick="App.signIn()">' +
+          '<svg viewBox="0 0 24 24" width="18" height="18" style="stroke:none"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>' +
+          'Sign in with Google</button>'
+      : '<button class="btn btn-secondary" onclick="App.switchTab(\'settings\')">&#9881;&#65039; Go to Settings</button>') +
+    '</div>';
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function fmtGBP(n) {
+  return '&#163;' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+// ─────────────────────────────────────────────────────────────
+// APP
+// ─────────────────────────────────────────────────────────────
+var App = {
   currentTab: 'labour',
+  _toastTimer: null,
 
-  async init() {
+  init: function () {
     State.load();
-
-    // Handle OAuth redirect (implicit flow returns here with token in hash)
-    const wasRedirect = OAuth.handleRedirectToken();
-
-    this.updateAuthUI();
-    this.populateSettings();
-
-    document.getElementById('project-name-display').textContent =
-      State.get('projectName', 'ECM Solar Farm');
+    var wasRedirect = OAuth.handleRedirect();
+    App.updateAuthUI();
+    Settings.populate();
+    document.getElementById('proj-name').textContent = State.get('projName', 'ECM Solar Farm');
 
     if (State.isSignedIn) {
-      const returnTab = sessionStorage.getItem('oauth_return_tab') || 'labour';
-      sessionStorage.removeItem('oauth_return_tab');
-      this.switchTab(returnTab);
-      if (wasRedirect) App.showToast('Signed in successfully', 'success');
+      var ret = sessionStorage.getItem('oauth_return') || 'labour';
+      sessionStorage.removeItem('oauth_return');
+      App.switchTab(ret);
+      if (wasRedirect) App.toast('Signed in successfully', 'success');
     } else if (!State.get('clientId')) {
-      // First run — no Client ID yet. Open Settings so user can configure.
-      this.switchTab('settings');
+      App.switchTab('settings');
     } else {
-      // Client ID set but not signed in — open Labour tab (will show sign-in card).
-      this.switchTab('labour');
+      App.switchTab('labour');
     }
   },
 
-  updateAuthUI() {
-    const dot = document.getElementById('auth-dot');
-    const label = document.getElementById('auth-label');
-    const settingsBtn = document.getElementById('settings-auth-btn');
-    const settingsInfo = document.getElementById('settings-auth-info');
-    const hasClientId = !!State.get('clientId');
+  updateAuthUI: function () {
+    var dot   = document.getElementById('auth-dot');
+    var label = document.getElementById('auth-label');
+    var btn   = document.getElementById('s-auth-btn');
+    var info  = document.getElementById('s-auth-info');
+    var hasId = !!State.get('clientId');
 
     if (State.isSignedIn) {
-      dot.className = 'dot connected';
+      dot.className = 'dot on';
       label.textContent = 'Connected';
-      settingsBtn.textContent = 'Sign Out';
-      settingsBtn.onclick = () => App.signOut();
-      settingsInfo.innerHTML = '<span class="badge badge-green">✓ Signed in to Google</span>';
+      btn.textContent = 'Sign Out';
+      btn.onclick = function () { App.signOut(); };
+      info.innerHTML = '<span class="badge badge-green">&#10003; Signed in to Google</span>';
     } else {
       dot.className = 'dot';
       label.textContent = 'Not signed in';
-      settingsBtn.textContent = 'Sign in with Google';
-      settingsBtn.onclick = () => App.signIn();
-      settingsInfo.innerHTML = hasClientId
+      btn.textContent = 'Sign in with Google';
+      btn.onclick = function () { App.signIn(); };
+      info.innerHTML = hasId
         ? '<div class="text-muted">Not signed in</div>'
-        : '<div class="text-muted" style="font-size:12px">Enter your Client ID above and tap Save, then sign in.</div>';
+        : '<div class="text-muted" style="font-size:12px">Save your Client ID above, then tap Sign in.</div>';
     }
   },
 
-  async signIn() {
-    try {
-      App.showLoading('Opening Google sign-in…');
-      const { token, expiresIn } = await OAuth.signIn();
-      State.saveToken(token, expiresIn);
+  signIn: function () {
+    App.showLoading('Opening Google sign-in&#8230;');
+    OAuth.signIn().then(function (result) {
+      State.saveToken(result.token, result.expiresIn);
       App.hideLoading();
       App.updateAuthUI();
-      App.showToast('Signed in successfully', 'success');
+      App.toast('Signed in successfully', 'success');
       App.switchTab('labour');
-    } catch(e) {
+    }).catch(function (e) {
       App.hideLoading();
-      if (e.message !== 'popup blocked' && e.message !== 'no_client_id') {
-        App.showToast('Sign in failed: ' + e.message, 'error');
+      if (e.message !== 'popup_blocked' && e.message !== 'no_client_id' && e.message !== 'popup_closed') {
+        App.toast('Sign in failed: ' + e.message, 'error');
       }
-    }
+    });
   },
 
-  signOut() {
+  signOut: function () {
     if (!confirm('Sign out of Google?')) return;
-    this.handleSignOut();
-  },
-
-  handleSignOut() {
     State.clearToken();
-    this.updateAuthUI();
-    App.showToast('Signed out', 'info');
-    // Re-render current tab so it shows the sign-in card
-    App.switchTab(this.currentTab === 'settings' ? 'settings' : 'labour');
+    App.updateAuthUI();
+    App.toast('Signed out', 'info');
+    App.switchTab('labour');
   },
 
-  // Tab navigation is always unconditional — auth state is handled inside each screen.
-  switchTab(tab) {
-    this.currentTab = tab;
-    State.currentTab = tab;
-
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-
-    document.getElementById(`tab-${tab}`).classList.add('active');
-    document.getElementById(`screen-${tab}`).classList.add('active');
-
+  // Tab bar is always functional — auth is handled inline within each screen.
+  switchTab: function (tab) {
+    App.currentTab = tab;
+    var tabs = ['labour', 'costs', 'dashboard', 'settings'];
+    for (var i = 0; i < tabs.length; i++) {
+      var t = tabs[i];
+      document.getElementById('tab-' + t).className = 'tab-btn' + (t === tab ? ' active' : '');
+      document.getElementById('screen-' + t).className = 'screen' + (t === tab ? ' active' : '');
+    }
     if (tab === 'labour')    Labour.init();
-    if (tab === 'costs')     Costs.onTabOpen();
+    if (tab === 'costs')     Costs.onOpen();
     if (tab === 'dashboard') Dashboard.load();
-    if (tab === 'settings')  this.populateSettings();
+    if (tab === 'settings')  Settings.populate();
   },
 
-  closeModal(id) {
-    document.getElementById(id).style.display = 'none';
-  },
-
-  showModal(id) {
-    document.getElementById(id).style.display = 'flex';
-  },
-
-  showLoading(text = 'Loading…') {
-    document.getElementById('loading-text').textContent = text;
+  showLoading: function (text) {
+    document.getElementById('loading-text').innerHTML = text || 'Loading&#8230;';
     document.getElementById('loading-overlay').style.display = 'flex';
   },
 
-  hideLoading() {
+  hideLoading: function () {
     document.getElementById('loading-overlay').style.display = 'none';
   },
 
-  _toastTimer: null,
-  showToast(msg, type = 'info') {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = `toast ${type} show`;
-    clearTimeout(this._toastTimer);
-    this._toastTimer = setTimeout(() => {
-      el.className = 'toast';
-    }, 3000);
+  toast: function (msg, type) {
+    var el = document.getElementById('toast');
+    el.innerHTML = msg;
+    el.className = 'toast ' + (type || 'info') + ' show';
+    clearTimeout(App._toastTimer);
+    App._toastTimer = setTimeout(function () { el.className = 'toast'; }, 3200);
   },
 
-  populateSettings() {
-    document.getElementById('settings-client-id').value = State.get('clientId', '');
-    document.getElementById('settings-sheet-id').value = State.get('sheetId');
-    document.getElementById('settings-folder-id').value = State.get('folderId');
-    document.getElementById('settings-project-name').value = State.get('projectName', 'ECM Solar Farm');
-    document.getElementById('settings-budget').value = State.get('budget', '');
-    document.getElementById('settings-daily-rate').value = State.get('dailyRate', '180');
-    document.getElementById('settings-api-key').value = State.get('anthropicKey', '');
+  openModal: function (id) {
+    document.getElementById(id).className = 'modal-back open';
+  },
+
+  closeModal: function (id) {
+    document.getElementById(id).className = 'modal-back';
   }
 };
 
-// ═══════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
 // SETTINGS
-// ═══════════════════════════════════════════════════════
-const Settings = {
-  save() {
-    State.set('clientId', document.getElementById('settings-client-id').value.trim());
-    State.set('sheetId', document.getElementById('settings-sheet-id').value.trim());
-    State.set('folderId', document.getElementById('settings-folder-id').value.trim());
-    State.set('projectName', document.getElementById('settings-project-name').value.trim() || 'ECM Solar Farm');
-    State.set('budget', document.getElementById('settings-budget').value);
-    State.set('dailyRate', document.getElementById('settings-daily-rate').value || '180');
-    State.set('anthropicKey', document.getElementById('settings-api-key').value.trim());
-    State.saveSettings();
-
-    document.getElementById('project-name-display').textContent = State.get('projectName', 'ECM Solar Farm');
+// ─────────────────────────────────────────────────────────────
+var Settings = {
+  populate: function () {
+    document.getElementById('s-client-id').value = State.get('clientId');
+    document.getElementById('s-sheet-id').value  = State.get('sheetId');
+    document.getElementById('s-folder-id').value = State.get('folderId');
+    document.getElementById('s-proj-name').value = State.get('projName', 'ECM Solar Farm');
+    document.getElementById('s-budget').value    = State.get('budget', '');
+    document.getElementById('s-rate').value      = State.get('dailyRate', '180');
+    document.getElementById('s-api-key').value   = State.get('anthropicKey', '');
     App.updateAuthUI();
-    App.showToast('Settings saved ✓', 'success');
   },
 
-  signOut() {
+  save: function () {
+    State.set('clientId',     document.getElementById('s-client-id').value.trim());
+    State.set('sheetId',      document.getElementById('s-sheet-id').value.trim());
+    State.set('folderId',     document.getElementById('s-folder-id').value.trim());
+    State.set('projName',     document.getElementById('s-proj-name').value.trim() || 'ECM Solar Farm');
+    State.set('budget',       document.getElementById('s-budget').value);
+    State.set('dailyRate',    document.getElementById('s-rate').value || '180');
+    State.set('anthropicKey', document.getElementById('s-api-key').value.trim());
+    State.saveCfg();
+    document.getElementById('proj-name').textContent = State.get('projName', 'ECM Solar Farm');
+    App.updateAuthUI();
+    App.toast('Settings saved &#10003;', 'success');
+  },
+
+  signOut: function () {
     App.signOut();
   },
 
-  async initSheet() {
-    const sheetId = State.get('sheetId');
-    if (!sheetId) {
-      App.showToast('Enter your Sheet ID first', 'error');
-      return;
-    }
-    if (!State.isSignedIn) {
-      App.showToast('Sign in to Google first', 'error');
-      return;
-    }
-    if (!confirm('This will add tabs and headers to your Google Sheet. Continue?')) return;
+  initSheet: function () {
+    var sheetId = State.get('sheetId');
+    if (!sheetId)          { App.toast('Enter your Sheet ID first', 'error'); return; }
+    if (!State.isSignedIn) { App.toast('Sign in to Google first', 'error'); return; }
+    if (!confirm('Create tabs and headers in your Google Sheet?')) return;
 
-    App.showLoading('Setting up Google Sheet…');
-    try {
-      // Get existing sheets
-      const meta = await GApi.getSheetMeta(sheetId);
-      const existingNames = meta.sheets.map(s => s.properties.title);
-
-      const requiredSheets = [
-        { name: 'Workers', headers: ['ID', 'Full Name', 'Daily Rate', 'Start Date', 'Active'] },
-        { name: 'Labour', headers: ['Date', 'Worker Name', 'Worker ID', 'Status', 'Daily Rate', 'Pay'] },
-        { name: 'Costs', headers: ['Date', 'Supplier', 'Invoice Number', 'Total', 'VAT', 'Category', 'Notes', 'Drive File ID'] },
+    App.showLoading('Setting up Google Sheet&#8230;');
+    GApi.getMeta(sheetId).then(function (meta) {
+      var existing = meta.sheets.map(function (s) { return s.properties.title; });
+      var required = [
+        { name: 'Workers',   headers: ['ID', 'Full Name', 'Daily Rate', 'Start Date', 'Active'] },
+        { name: 'Labour',    headers: ['Date', 'Worker Name', 'Worker ID', 'Status', 'Daily Rate', 'Pay'] },
+        { name: 'Costs',     headers: ['Date', 'Supplier', 'Invoice Number', 'Total', 'VAT', 'Category', 'Notes', 'Drive File ID'] },
         { name: 'Dashboard', headers: ['Metric', 'Value'] }
       ];
-
-      const addRequests = [];
-      for (const s of requiredSheets) {
-        if (!existingNames.includes(s.name)) {
-          addRequests.push({ addSheet: { properties: { title: s.name } } });
+      var adds = [];
+      required.forEach(function (s) {
+        if (existing.indexOf(s.name) === -1) {
+          adds.push({ addSheet: { properties: { title: s.name } } });
         }
-      }
-
-      if (addRequests.length > 0) {
-        await GApi.batchUpdate(sheetId, addRequests);
-      }
-
-      // Write headers
-      for (const s of requiredSheets) {
-        await GApi.updateSheet(sheetId, `${s.name}!A1`, [s.headers]);
-      }
-
-      // Add Dashboard formulas
-      const dashData = [
-        ['Total Labour Cost', "=SUM(Labour!F:F)"],
-        ['Total Invoice Spend', "=SUM(Costs!D:D)"],
-        ['Total Project Spend', "=SUM(Labour!F:F)+SUM(Costs!D:D)"],
-        ['Working Days Logged', "=COUNTA(UNIQUE(Labour!A2:A))"],
-        ['Active Workers', "=COUNTIF(Workers!E:E,\"TRUE\")"]
-      ];
-      await GApi.updateSheet(sheetId, 'Dashboard!A2', dashData);
-
+      });
+      var p = adds.length ? GApi.batchUpdate(sheetId, adds) : Promise.resolve();
+      return p.then(function () { return required; });
+    }).then(function (required) {
+      var chain = Promise.resolve();
+      required.forEach(function (s) {
+        chain = chain.then(function () {
+          return GApi.updateRange(sheetId, s.name + '!A1', [s.headers]);
+        });
+      });
+      return chain;
+    }).then(function () {
+      return GApi.updateRange(sheetId, 'Dashboard!A2', [
+        ['Total Labour Cost',    '=SUM(Labour!F:F)'],
+        ['Total Invoice Spend',  '=SUM(Costs!D:D)'],
+        ['Total Project Spend',  '=SUM(Labour!F:F)+SUM(Costs!D:D)'],
+        ['Working Days Logged',  '=COUNTA(UNIQUE(Labour!A2:A))'],
+        ['Active Workers',       '=COUNTIF(Workers!E:E,"TRUE")']
+      ]);
+    }).then(function () {
       App.hideLoading();
-      App.showToast('Sheet initialised successfully!', 'success');
-    } catch(e) {
+      App.toast('Sheet initialised!', 'success');
+    }).catch(function (e) {
       App.hideLoading();
-      App.showToast('Error: ' + e.message, 'error');
-    }
+      App.toast('Error: ' + e.message, 'error');
+    });
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// LABOUR MODULE
-// ═══════════════════════════════════════════════════════
-const Labour = {
-  selectedDate: null,
-  workers: [],
-  attendance: {}, // workerId -> 'present' | 'absent' | null
-  existingRows: {}, // workerId -> row index in sheet (1-based)
-  todayAttendanceLoaded: false,
+// ─────────────────────────────────────────────────────────────
+// LABOUR
+// ─────────────────────────────────────────────────────────────
+var Labour = {
+  date:       null,
+  workers:    [],
+  attendance: {},
+  _sheetIdCache: {},
 
-  init() {
+  init: function () {
     if (!State.isSignedIn) {
-      this._showSignInCard('labour-worker-list', 'Labour Tracker');
+      document.getElementById('labour-list').innerHTML = signinCard('Labour Tracker');
       document.getElementById('labour-save-btn').style.display = 'none';
-      document.getElementById('labour-weekly-summary').style.display = 'none';
+      document.getElementById('labour-totals-card').style.display = 'none';
       return;
     }
-    if (!this.selectedDate) {
-      this.selectedDate = new Date();
-      this.selectedDate.setHours(0,0,0,0);
+    if (!Labour.date) {
+      Labour.date = new Date();
+      Labour.date.setHours(0, 0, 0, 0);
     }
-    this.updateDateDisplay();
-    this.loadWorkers();
+    Labour._renderDateNav();
+    Labour._loadWorkers();
   },
 
-  _showSignInCard(containerId, featureName) {
-    const hasClientId = !!State.get('clientId');
-    document.getElementById(containerId).innerHTML = `
-      <div class="signin-card">
-        <div class="auth-logo">🔒</div>
-        <div class="auth-title">Sign in required</div>
-        <div class="auth-sub">${hasClientId
-          ? `Sign in with Google to use ${featureName}.`
-          : `Set up your Google Client ID in Settings, then sign in.`
-        }</div>
-        ${hasClientId
-          ? `<button class="btn btn-primary" onclick="App.signIn()" style="max-width:260px">
-               <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
-               Sign in with Google
-             </button>`
-          : `<button class="btn btn-secondary" onclick="App.switchTab('settings')" style="max-width:260px">
-               ⚙️ Go to Settings
-             </button>`
-        }
-      </div>`;
+  _isoDate: function (d) {
+    return d.toISOString().split('T')[0];
   },
 
-  updateDateDisplay() {
-    const d = this.selectedDate;
-    const today = new Date(); today.setHours(0,0,0,0);
-    const isToday = d.getTime() === today.getTime();
-    const isTomorrow = d.getTime() === today.getTime() + 86400000;
-
-    const opts = { weekday: 'long', day: 'numeric', month: 'long' };
-    document.getElementById('labour-date-display').textContent = d.toLocaleDateString('en-GB', opts);
-    document.getElementById('labour-date-sub').textContent = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : d.toLocaleDateString('en-GB');
-
-    // Disable forward nav past today
-    const nextBtn = document.getElementById('labour-next-btn');
-    nextBtn.style.opacity = d >= today ? '0.3' : '1';
-    nextBtn.disabled = d >= today;
+  _renderDateNav: function () {
+    var d     = Labour.date;
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var opts  = { weekday: 'long', day: 'numeric', month: 'long' };
+    document.getElementById('labour-date-main').textContent = d.toLocaleDateString('en-GB', opts);
+    document.getElementById('labour-date-sub').textContent  =
+      d.getTime() === today.getTime() ? 'Today' : d.toLocaleDateString('en-GB');
+    var nb = document.getElementById('labour-next-btn');
+    nb.style.opacity  = d >= today ? '0.3' : '1';
+    nb.disabled       = d >= today;
   },
 
-  prevDay() {
-    this.selectedDate = new Date(this.selectedDate.getTime() - 86400000);
-    this.attendance = {};
-    this.existingRows = {};
-    this.updateDateDisplay();
-    this.loadAttendanceForDate();
+  prevDay: function () {
+    Labour.date = new Date(Labour.date.getTime() - 86400000);
+    Labour.attendance = {};
+    Labour._renderDateNav();
+    Labour._loadAttendance();
   },
 
-  nextDay() {
-    const today = new Date(); today.setHours(0,0,0,0);
-    if (this.selectedDate >= today) return;
-    this.selectedDate = new Date(this.selectedDate.getTime() + 86400000);
-    this.attendance = {};
-    this.existingRows = {};
-    this.updateDateDisplay();
-    this.loadAttendanceForDate();
+  nextDay: function () {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    if (Labour.date >= today) return;
+    Labour.date = new Date(Labour.date.getTime() + 86400000);
+    Labour.attendance = {};
+    Labour._renderDateNav();
+    Labour._loadAttendance();
   },
 
-  formatDate(d) {
-    return d.toISOString().split('T')[0]; // YYYY-MM-DD
-  },
-
-  formatDateDisplay(d) {
-    return d.toLocaleDateString('en-GB'); // DD/MM/YYYY
-  },
-
-  async loadWorkers() {
-    const sheetId = State.get('sheetId');
+  _loadWorkers: function () {
+    var sheetId = State.get('sheetId');
     if (!sheetId) {
-      document.getElementById('labour-worker-list').innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">⚙️</div>
-          <div>Configure your Google Sheet ID in Settings first</div>
-        </div>`;
+      document.getElementById('labour-list').innerHTML =
+        '<div class="empty-state"><div class="empty-icon">&#9881;</div>' +
+        '<div>Add your Sheet ID in Settings first</div></div>';
       return;
     }
-
-    App.showLoading('Loading workers…');
-    try {
-      const res = await GApi.getSheet(sheetId, 'Workers!A:E');
-      const rows = (res.values || []).slice(1); // skip header
-
-      this.workers = rows
-        .filter(r => r[4] !== 'FALSE' && r[4] !== false)
-        .map(r => ({
-          id: r[0] || '',
-          name: r[1] || '',
-          rate: parseFloat(r[2]) || parseFloat(State.get('dailyRate', '180')),
-          startDate: r[3] || '',
-          active: r[4] !== 'FALSE'
-        }))
-        .filter(w => w.name);
-
+    App.showLoading('Loading workers&#8230;');
+    GApi.getRange(sheetId, 'Workers!A:E').then(function (res) {
+      var rows = (res.values || []).slice(1);
+      Labour.workers = rows
+        .filter(function (r) { return r[1] && r[4] !== 'FALSE'; })
+        .map(function (r) {
+          return {
+            id:   r[0] || '',
+            name: r[1] || '',
+            rate: parseFloat(r[2]) || parseFloat(State.get('dailyRate', '180'))
+          };
+        });
       App.hideLoading();
-      await this.loadAttendanceForDate();
-    } catch(e) {
+      Labour._loadAttendance();
+    }).catch(function (e) {
       App.hideLoading();
-      document.getElementById('labour-worker-list').innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">⚠️</div>
-          <div>Error loading workers: ${e.message}</div>
-        </div>`;
-    }
+      document.getElementById('labour-list').innerHTML =
+        '<div class="empty-state"><div class="empty-icon">&#9888;</div>' +
+        '<div>Error: ' + esc(e.message) + '</div></div>';
+    });
   },
 
-  async loadAttendanceForDate() {
-    const sheetId = State.get('sheetId');
-    if (!sheetId) return;
-
-    const dateStr = this.formatDate(this.selectedDate);
-    this.attendance = {};
-    this.existingRows = {};
-
-    try {
-      const res = await GApi.getSheet(sheetId, 'Labour!A:F');
-      const rows = (res.values || []).slice(1);
-
-      rows.forEach((row, idx) => {
-        if (row[0] === dateStr) {
-          const workerName = row[1];
-          const workerId = row[2];
-          const status = row[3];
-          const key = workerId || workerName;
-          this.attendance[key] = status === 'Present' ? 'present' : 'absent';
-          this.existingRows[key] = idx + 2; // 1-based, +1 for header
+  _loadAttendance: function () {
+    var sheetId = State.get('sheetId');
+    if (!sheetId) { Labour._renderWorkers(); return; }
+    var dateStr = Labour._isoDate(Labour.date);
+    GApi.getRange(sheetId, 'Labour!A:F').then(function (res) {
+      Labour.attendance = {};
+      var rows = (res.values || []).slice(1);
+      rows.forEach(function (r) {
+        if (r[0] === dateStr) {
+          var key = r[2] || r[1];
+          Labour.attendance[key] = r[3] === 'Present' ? 'present' : 'absent';
         }
       });
-
-      this.renderWorkers();
-      this.loadTotals();
-    } catch(e) {
-      this.renderWorkers();
-    }
+      Labour._renderWorkers();
+      Labour._loadTotals(rows);
+    }).catch(function () {
+      Labour._renderWorkers();
+    });
   },
 
-  renderWorkers() {
-    const list = document.getElementById('labour-worker-list');
-
-    if (this.workers.length === 0) {
-      list.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">👷</div>
-          <div>No active workers. Add a worker below.</div>
-        </div>`;
+  _renderWorkers: function () {
+    var list = document.getElementById('labour-list');
+    if (Labour.workers.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128119;</div>' +
+        '<div>No active workers. Add one below.</div></div>';
       document.getElementById('labour-save-btn').style.display = 'none';
       return;
     }
-
-    list.innerHTML = this.workers.map(w => {
-      const key = w.id || w.name;
-      const status = this.attendance[key] || null;
-      return `
-        <div class="worker-row" id="wrow-${CSS.escape(key)}">
-          <div class="worker-info">
-            <div class="worker-name">${this.escHtml(w.name)}</div>
-            <div class="worker-meta">£${w.rate}/day</div>
-          </div>
-          <div class="attendance-toggle">
-            <button class="att-btn ${status === 'present' ? 'present' : ''}"
-              onclick="Labour.setAttendance('${CSS.escape(key)}', 'present')">✓</button>
-            <button class="att-btn ${status === 'absent' ? 'absent' : ''}"
-              onclick="Labour.setAttendance('${CSS.escape(key)}', 'absent')">✗</button>
-          </div>
-        </div>`;
-    }).join('');
-
+    var html = '';
+    Labour.workers.forEach(function (w) {
+      var key    = w.id || w.name;
+      var ekey   = esc(key);
+      var status = Labour.attendance[key] || '';
+      html += '<div class="worker-row" id="wr-' + btoa(unescape(encodeURIComponent(key))).replace(/[^a-zA-Z0-9]/g, '_') + '">' +
+        '<div class="worker-info">' +
+          '<div class="worker-name">' + esc(w.name) + '</div>' +
+          '<div class="worker-meta">&#163;' + w.rate + '/day</div>' +
+        '</div>' +
+        '<div class="att-wrap">' +
+          '<button class="att-btn' + (status === 'present' ? ' present' : '') + '" ' +
+            'onclick="Labour.setAtt(\'' + ekey.replace(/'/g, "\\'") + '\',\'present\')">&#10003;</button>' +
+          '<button class="att-btn' + (status === 'absent'  ? ' absent'  : '') + '" ' +
+            'onclick="Labour.setAtt(\'' + ekey.replace(/'/g, "\\'") + '\',\'absent\')">&#10007;</button>' +
+        '</div>' +
+      '</div>';
+    });
+    list.innerHTML = html;
     document.getElementById('labour-save-btn').style.display = 'block';
   },
 
-  setAttendance(escapedKey, status) {
-    // Find the original key
-    const key = this.findWorkerKey(escapedKey);
-    if (!key) return;
-
-    this.attendance[key] = status;
-
-    const row = document.getElementById(`wrow-${escapedKey}`);
-    if (!row) return;
-    const btns = row.querySelectorAll('.att-btn');
-    btns[0].className = `att-btn ${status === 'present' ? 'present' : ''}`;
-    btns[1].className = `att-btn ${status === 'absent' ? 'absent' : ''}`;
+  setAtt: function (escapedKey, status) {
+    // Find real key from workers list
+    var key = escapedKey;
+    for (var i = 0; i < Labour.workers.length; i++) {
+      var k = Labour.workers[i].id || Labour.workers[i].name;
+      if (esc(k) === escapedKey) { key = k; break; }
+    }
+    Labour.attendance[key] = status;
+    // Update button states without full re-render
+    var rowId = 'wr-' + btoa(unescape(encodeURIComponent(key))).replace(/[^a-zA-Z0-9]/g, '_');
+    var row = document.getElementById(rowId);
+    if (row) {
+      var btns = row.querySelectorAll('.att-btn');
+      btns[0].className = 'att-btn' + (status === 'present' ? ' present' : '');
+      btns[1].className = 'att-btn' + (status === 'absent'  ? ' absent'  : '');
+    }
   },
 
-  findWorkerKey(escapedKey) {
-    // CSS.escape is not reversible, so we match against workers
-    for (const w of this.workers) {
-      const k = w.id || w.name;
-      if (CSS.escape(k) === escapedKey) return k;
-    }
-    return escapedKey;
-  },
+  save: function () {
+    var sheetId = State.get('sheetId');
+    if (!sheetId) { App.toast('No Sheet ID configured', 'error'); return; }
+    var dateStr = Labour._isoDate(Labour.date);
+    var rows = [];
+    Labour.workers.forEach(function (w) {
+      var key    = w.id || w.name;
+      var status = Labour.attendance[key];
+      if (!status) return;
+      var label = status === 'present' ? 'Present' : 'Absent';
+      var pay   = status === 'present' ? w.rate : 0;
+      rows.push([dateStr, w.name, w.id || '', label, w.rate, pay]);
+    });
+    if (rows.length === 0) { App.toast('Mark at least one worker first', 'error'); return; }
 
-  async saveAttendance() {
-    const sheetId = State.get('sheetId');
-    if (!sheetId) {
-      App.showToast('No Sheet ID configured', 'error');
-      return;
-    }
-
-    const dateStr = this.formatDate(this.selectedDate);
-    const rows = [];
-
-    for (const w of this.workers) {
-      const key = w.id || w.name;
-      const status = this.attendance[key];
-      if (!status) continue; // Skip workers not marked
-
-      const statusLabel = status === 'present' ? 'Present' : 'Absent';
-      const pay = status === 'present' ? w.rate : 0;
-      rows.push([dateStr, w.name, w.id || '', statusLabel, w.rate, pay]);
-    }
-
-    if (rows.length === 0) {
-      App.showToast('Mark at least one worker first', 'error');
-      return;
-    }
-
-    App.showLoading('Saving attendance…');
-    try {
-      // For existing rows on this date, we need to handle updates
-      // Strategy: delete existing rows for this date then re-append
-      // Simpler: just append (allows duplicates handled by date query)
-      // Better approach: check existing and update or append
-
-      const res = await GApi.getSheet(sheetId, 'Labour!A:F');
-      const allRows = res.values || [];
-
-      // Find rows for this date
-      const dateRowIndices = [];
-      allRows.forEach((row, idx) => {
-        if (idx > 0 && row[0] === dateStr) dateRowIndices.push(idx + 1);
+    App.showLoading('Saving attendance&#8230;');
+    // Clear existing rows for this date then append fresh
+    GApi.getRange(sheetId, 'Labour!A:F').then(function (res) {
+      var all    = res.values || [];
+      var idxs   = [];
+      all.forEach(function (r, i) {
+        if (i > 0 && r[0] === dateStr) idxs.push(i);
       });
-
-      if (dateRowIndices.length > 0) {
-        // Clear existing rows for this date by blanking them
-        // Then append new data
-        const clearReqs = dateRowIndices.map(idx => ({
-          updateCells: {
-            range: {
-              sheetId: await this.getSheetId(sheetId, 'Labour'),
-              startRowIndex: idx - 1,
-              endRowIndex: idx,
-              startColumnIndex: 0,
-              endColumnIndex: 6
-            },
+      if (idxs.length === 0) return Promise.resolve();
+      return Labour._getTabSheetId(sheetId, 'Labour').then(function (tabId) {
+        var reqs = idxs.map(function (i) {
+          return { updateCells: {
+            range: { sheetId: tabId, startRowIndex: i, endRowIndex: i + 1, startColumnIndex: 0, endColumnIndex: 6 },
             fields: 'userEnteredValue'
-          }
-        }));
-        await GApi.batchUpdate(sheetId, clearReqs);
-      }
-
-      await GApi.appendSheet(sheetId, 'Labour!A:F', rows);
-
-      App.hideLoading();
-      const presentCount = rows.filter(r => r[3] === 'Present').length;
-      App.showToast(`Saved: ${presentCount} present, ${rows.length - presentCount} absent`, 'success');
-      this.loadTotals();
-    } catch(e) {
-      App.hideLoading();
-      App.showToast('Error saving: ' + e.message, 'error');
-    }
-  },
-
-  _sheetIdCache: {},
-  async getSheetId(spreadsheetId, sheetName) {
-    const cacheKey = `${spreadsheetId}:${sheetName}`;
-    if (this._sheetIdCache[cacheKey]) return this._sheetIdCache[cacheKey];
-
-    const meta = await GApi.getSheetMeta(spreadsheetId);
-    for (const s of meta.sheets) {
-      this._sheetIdCache[`${spreadsheetId}:${s.properties.title}`] = s.properties.sheetId;
-    }
-    return this._sheetIdCache[cacheKey];
-  },
-
-  async loadTotals() {
-    const sheetId = State.get('sheetId');
-    if (!sheetId) return;
-
-    try {
-      const res = await GApi.getSheet(sheetId, 'Labour!A:F');
-      const rows = (res.values || []).slice(1);
-
-      const totals = {};
-      const daysByWorker = {};
-
-      rows.forEach(row => {
-        if (!row[1] || row[3] !== 'Present') return;
-        const name = row[1];
-        const pay = parseFloat(row[5]) || 0;
-        totals[name] = (totals[name] || 0) + pay;
-        daysByWorker[name] = (daysByWorker[name] || 0) + 1;
+          }};
+        });
+        return GApi.batchUpdate(sheetId, reqs);
       });
-
-      const container = document.getElementById('labour-totals-list');
-      const summaryCard = document.getElementById('labour-weekly-summary');
-
-      if (Object.keys(totals).length === 0) {
-        summaryCard.style.display = 'none';
-        return;
-      }
-
-      summaryCard.style.display = 'block';
-      container.innerHTML = Object.entries(totals)
-        .sort((a,b) => b[1]-a[1])
-        .map(([name, total]) => `
-          <div class="worker-summary-row">
-            <div>
-              <div style="font-weight:600">${this.escHtml(name)}</div>
-              <div class="text-muted">${daysByWorker[name]} day${daysByWorker[name]!==1?'s':''} worked</div>
-            </div>
-            <div class="worker-earn">
-              <div class="total">£${total.toFixed(2)}</div>
-            </div>
-          </div>`)
-        .join('');
-    } catch(e) {
-      // Silent fail for totals
-    }
-  },
-
-  showAddWorker() {
-    document.getElementById('new-worker-name').value = '';
-    document.getElementById('new-worker-date').value = this.formatDate(new Date());
-    document.getElementById('new-worker-rate').value = '';
-    App.showModal('modal-add-worker');
-  },
-
-  async addWorker() {
-    const name = document.getElementById('new-worker-name').value.trim();
-    const startDate = document.getElementById('new-worker-date').value;
-    const rateInput = document.getElementById('new-worker-rate').value;
-    const rate = rateInput ? parseFloat(rateInput) : parseFloat(State.get('dailyRate', '180'));
-
-    if (!name) {
-      App.showToast('Enter worker name', 'error');
-      return;
-    }
-
-    const sheetId = State.get('sheetId');
-    if (!sheetId) {
-      App.showToast('No Sheet ID configured', 'error');
-      return;
-    }
-
-    App.showLoading('Adding worker…');
-    try {
-      const workerId = 'W' + Date.now();
-      await GApi.appendSheet(sheetId, 'Workers!A:E', [
-        [workerId, name, rate, startDate, 'TRUE']
-      ]);
-
-      App.closeModal('modal-add-worker');
+    }).then(function () {
+      return GApi.appendRows(sheetId, 'Labour!A:F', rows);
+    }).then(function () {
       App.hideLoading();
-      App.showToast(`${name} added`, 'success');
-      await this.loadWorkers();
-    } catch(e) {
+      var p = rows.filter(function (r) { return r[3] === 'Present'; }).length;
+      App.toast('Saved: ' + p + ' present, ' + (rows.length - p) + ' absent', 'success');
+      Labour._loadAttendance();
+    }).catch(function (e) {
       App.hideLoading();
-      App.showToast('Error: ' + e.message, 'error');
-    }
+      App.toast('Error: ' + e.message, 'error');
+    });
   },
 
-  escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  _getTabSheetId: function (spreadsheetId, tabName) {
+    var cacheKey = spreadsheetId + ':' + tabName;
+    if (Labour._sheetIdCache[cacheKey] !== undefined) {
+      return Promise.resolve(Labour._sheetIdCache[cacheKey]);
+    }
+    return GApi.getMeta(spreadsheetId).then(function (meta) {
+      meta.sheets.forEach(function (s) {
+        Labour._sheetIdCache[spreadsheetId + ':' + s.properties.title] = s.properties.sheetId;
+      });
+      return Labour._sheetIdCache[cacheKey];
+    });
+  },
+
+  _loadTotals: function (labourRows) {
+    var totals = {};
+    var days   = {};
+    labourRows.forEach(function (r) {
+      if (!r[1] || r[3] !== 'Present') return;
+      var n = r[1];
+      totals[n] = (totals[n] || 0) + (parseFloat(r[5]) || 0);
+      days[n]   = (days[n]   || 0) + 1;
+    });
+    var card = document.getElementById('labour-totals-card');
+    var keys = Object.keys(totals);
+    if (keys.length === 0) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    keys.sort(function (a, b) { return totals[b] - totals[a]; });
+    var html = '';
+    keys.forEach(function (n) {
+      html += '<div class="sum-row">' +
+        '<div><div style="font-weight:600">' + esc(n) + '</div>' +
+        '<div class="text-muted">' + days[n] + ' day' + (days[n] !== 1 ? 's' : '') + '</div></div>' +
+        '<div style="font-weight:700;color:var(--accent)">&#163;' + totals[n].toFixed(2) + '</div>' +
+      '</div>';
+    });
+    document.getElementById('labour-totals').innerHTML = html;
+  },
+
+  showAddWorker: function () {
+    document.getElementById('nw-name').value = '';
+    document.getElementById('nw-date').value = Labour._isoDate(new Date());
+    document.getElementById('nw-rate').value = '';
+    App.openModal('modal-add-worker');
+  },
+
+  addWorker: function () {
+    var name   = document.getElementById('nw-name').value.trim();
+    var date   = document.getElementById('nw-date').value;
+    var rateIn = document.getElementById('nw-rate').value;
+    var rate   = rateIn ? parseFloat(rateIn) : parseFloat(State.get('dailyRate', '180'));
+    if (!name) { App.toast('Enter worker name', 'error'); return; }
+    var sheetId = State.get('sheetId');
+    if (!sheetId) { App.toast('No Sheet ID configured', 'error'); return; }
+
+    App.showLoading('Adding worker&#8230;');
+    var wid = 'W' + Date.now();
+    GApi.appendRows(sheetId, 'Workers!A:E', [[wid, name, rate, date, 'TRUE']])
+      .then(function () {
+        App.closeModal('modal-add-worker');
+        App.hideLoading();
+        App.toast(name + ' added', 'success');
+        Labour._loadWorkers();
+      }).catch(function (e) {
+        App.hideLoading();
+        App.toast('Error: ' + e.message, 'error');
+      });
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// COSTS MODULE
-// ═══════════════════════════════════════════════════════
-const Costs = {
-  currentFile: null,
-  currentFileType: null,
-  extractedData: null,
+// ─────────────────────────────────────────────────────────────
+// COSTS
+// ─────────────────────────────────────────────────────────────
+var Costs = {
+  file: null,
 
-  onTabOpen() {
-    // Show sign-in card over the upload zone if not authenticated
-    const zone = document.getElementById('upload-zone');
-    const existing = document.getElementById('costs-signin-card');
+  onOpen: function () {
+    var zone = document.getElementById('upload-zone');
+    var card = document.getElementById('costs-signin-card');
     if (!State.isSignedIn) {
-      if (!existing) {
-        const hasClientId = !!State.get('clientId');
-        const card = document.createElement('div');
-        card.id = 'costs-signin-card';
-        card.className = 'signin-card';
-        card.style.marginBottom = '12px';
-        card.innerHTML = hasClientId
-          ? `<div class="auth-logo">🔒</div>
-             <div class="auth-title">Sign in required</div>
-             <div class="auth-sub">Sign in with Google to scan and save invoices.</div>
-             <button class="btn btn-primary" onclick="App.signIn()" style="max-width:260px">
-               <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
-               Sign in with Google
-             </button>`
-          : `<div class="auth-logo">⚙️</div>
-             <div class="auth-title">Setup required</div>
-             <div class="auth-sub">Enter your Google Client ID in Settings first.</div>
-             <button class="btn btn-secondary" onclick="App.switchTab('settings')" style="max-width:260px">Go to Settings</button>`;
-        zone.parentNode.insertBefore(card, zone);
-      }
       zone.style.display = 'none';
+      if (!card) {
+        var el = document.createElement('div');
+        el.id = 'costs-signin-card';
+        el.innerHTML = signinCard('Invoice Scanner');
+        zone.parentNode.insertBefore(el, zone);
+      }
     } else {
-      if (existing) existing.remove();
       zone.style.display = '';
+      if (card) card.parentNode.removeChild(card);
     }
   },
 
-  triggerUpload() {
-    document.getElementById('invoice-file-input').click();
+  triggerUpload: function () {
+    document.getElementById('inv-file').click();
   },
 
-  async handleFile(event) {
-    const file = event.target.files[0];
+  handleFile: function (e) {
+    var file = e.target.files[0];
     if (!file) return;
+    Costs.file = file;
+    e.target.value = '';
 
-    this.currentFile = file;
-    this.currentFileType = file.type;
+    var preview = document.getElementById('inv-preview');
+    document.getElementById('costs-extract').style.display = 'block';
+    document.getElementById('extract-form').style.display  = 'none';
 
-    // Show preview
-    const previewContainer = document.getElementById('invoice-preview-container');
-    document.getElementById('costs-extraction-area').style.display = 'block';
-    document.getElementById('extraction-form').style.display = 'none';
-
-    if (file.type.startsWith('image/')) {
-      const url = URL.createObjectURL(file);
-      previewContainer.innerHTML = `<img src="${url}" alt="Invoice preview">`;
-      previewContainer.style.display = 'block';
+    if (file.type.indexOf('image') === 0) {
+      preview.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Invoice">';
+      preview.style.display = 'block';
     } else {
-      previewContainer.innerHTML = `<div style="padding:12px;color:var(--text-muted)">📄 ${file.name}</div>`;
-      previewContainer.style.display = 'block';
+      preview.innerHTML = '<div style="padding:10px;color:var(--muted)">&#128196; ' + esc(file.name) + '</div>';
+      preview.style.display = 'block';
     }
-
-    await this.extractWithClaude(file);
-
-    // Reset input so same file can be re-selected
-    event.target.value = '';
+    Costs._extract(file);
   },
 
-  async extractWithClaude(file) {
-    const apiKey = State.get('anthropicKey');
+  _fileToB64: function (file) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onload  = function (e) { resolve(e.target.result.split(',')[1]); };
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  },
+
+  _extract: function (file) {
+    var apiKey = State.get('anthropicKey');
     if (!apiKey) {
-      App.showToast('Enter Anthropic API key in Settings', 'error');
-      this.showManualForm({});
+      App.toast('Add Anthropic API key in Settings for auto-extraction', 'info');
+      Costs._showForm({});
       return;
     }
+    document.getElementById('extract-loading').style.display = 'block';
 
-    document.getElementById('extraction-loading').style.display = 'block';
-
-    try {
-      let base64Data, mediaType;
-
-      if (file.type === 'application/pdf') {
-        // PDF handling via base64
-        base64Data = await this.fileToBase64(file);
-        mediaType = 'application/pdf';
-      } else {
-        base64Data = await this.fileToBase64(file);
-        mediaType = file.type;
-      }
-
-      const prompt = `You are an invoice data extraction assistant. Extract all relevant information from this invoice image/document and return it as valid JSON only (no markdown, no explanation, just JSON).
-
-Return this exact structure:
-{
-  "supplier": "supplier name",
-  "invoiceNumber": "invoice number or null",
-  "date": "YYYY-MM-DD format or null",
-  "lineItems": [{"description": "item description", "amount": 0.00}],
-  "subtotal": 0.00,
-  "vat": 0.00,
-  "total": 0.00,
-  "currency": "GBP"
-}
-
-If a field cannot be determined, use null. For amounts, use numbers not strings.`;
-
-      const messages = [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: mediaType,
-                data: base64Data
-              }
-            },
-            {
-              type: 'text',
-              text: prompt
-            }
-          ]
-        }
+    Costs._fileToB64(file).then(function (b64) {
+      var isPdf   = file.type === 'application/pdf';
+      var content = [
+        isPdf
+          ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } }
+          : { type: 'image',    source: { type: 'base64', media_type: file.type,           data: b64 } },
+        { type: 'text', text:
+          'Extract invoice data and return ONLY valid JSON with keys: ' +
+          'supplier, invoiceNumber, date (YYYY-MM-DD), lineItems ([{description,amount}]), ' +
+          'vat (number), total (number). Use null for missing fields.' }
       ];
-
-      // For PDFs, use document type instead of image
-      if (file.type === 'application/pdf') {
-        messages[0].content[0] = {
-          type: 'document',
-          source: {
-            type: 'base64',
-            media_type: 'application/pdf',
-            data: base64Data
-          }
-        };
-      }
-
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      return fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1703,373 +1406,272 @@ If a field cannot be determined, use null. For amounts, use numbers not strings.
           'anthropic-version': '2023-06-01',
           'anthropic-dangerous-client-side-api-key-access': 'true'
         },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-5',
-          max_tokens: 1024,
-          messages
-        })
+        body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1024,
+          messages: [{ role: 'user', content: content }] })
       });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error?.message || `API error ${response.status}`);
+    }).then(function (r) {
+      if (!r.ok) return r.json().then(function (e) { throw new Error((e.error && e.error.message) || r.statusText); });
+      return r.json();
+    }).then(function (result) {
+      var text = result.content[0].text.trim();
+      var data;
+      try { data = JSON.parse(text); }
+      catch (_) {
+        var m = text.match(/\{[\s\S]*\}/);
+        data = m ? JSON.parse(m[0]) : {};
       }
-
-      const result = await response.json();
-      const text = result.content[0].text.trim();
-
-      // Parse JSON from response
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch(e) {
-        // Try to extract JSON from text
-        const match = text.match(/\{[\s\S]*\}/);
-        if (match) data = JSON.parse(match[0]);
-        else throw new Error('Could not parse invoice data from AI response');
-      }
-
-      document.getElementById('extraction-loading').style.display = 'none';
-      this.extractedData = data;
-      this.showManualForm(data);
-
-    } catch(e) {
-      document.getElementById('extraction-loading').style.display = 'none';
-      App.showToast('AI extraction failed: ' + e.message, 'error');
-      this.showManualForm({});
-    }
-  },
-
-  showManualForm(data) {
-    document.getElementById('inv-supplier').value = data.supplier || '';
-    document.getElementById('inv-number').value = data.invoiceNumber || '';
-    document.getElementById('inv-date').value = data.date || new Date().toISOString().split('T')[0];
-    document.getElementById('inv-total').value = data.total || '';
-    document.getElementById('inv-vat').value = data.vat || '';
-    document.getElementById('inv-notes').value = '';
-
-    // Line items
-    const lineSection = document.getElementById('line-items-section');
-    const lineContainer = document.getElementById('line-items-container');
-
-    if (data.lineItems && data.lineItems.length > 0) {
-      lineSection.style.display = 'block';
-      lineContainer.innerHTML = `
-        <table class="line-items-table">
-          <thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
-          <tbody>
-            ${data.lineItems.map(item => `
-              <tr>
-                <td>${this.escHtml(item.description || '')}</td>
-                <td style="text-align:right">£${(item.amount || 0).toFixed(2)}</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>`;
-    } else {
-      lineSection.style.display = 'none';
-    }
-
-    document.getElementById('extraction-form').style.display = 'block';
-  },
-
-  async confirmSave() {
-    const sheetId = State.get('sheetId');
-    const folderId = State.get('folderId');
-
-    if (!sheetId) {
-      App.showToast('No Sheet ID configured', 'error');
-      return;
-    }
-
-    const supplier = document.getElementById('inv-supplier').value.trim();
-    const invNumber = document.getElementById('inv-number').value.trim();
-    const invDate = document.getElementById('inv-date').value;
-    const total = parseFloat(document.getElementById('inv-total').value) || 0;
-    const vat = parseFloat(document.getElementById('inv-vat').value) || 0;
-    const category = document.getElementById('inv-category').value;
-    const notes = document.getElementById('inv-notes').value.trim();
-
-    if (!supplier) {
-      App.showToast('Enter supplier name', 'error');
-      return;
-    }
-
-    App.showLoading('Saving invoice…');
-
-    try {
-      let driveFileId = '';
-
-      // Upload to Drive if folder configured
-      if (folderId && this.currentFile) {
-        try {
-          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-          const ext = this.currentFile.name.split('.').pop() || 'jpg';
-          const fileName = `INV_${supplier.replace(/[^a-zA-Z0-9]/g,'_')}_${timestamp}.${ext}`;
-
-          const driveResult = await GApi.uploadFileToDrive(folderId, fileName, this.currentFile, this.currentFile.type);
-          driveFileId = driveResult.id || '';
-        } catch(e) {
-          App.showToast('Drive upload failed (data still saved): ' + e.message, 'error');
-        }
-      }
-
-      // Write to Costs sheet
-      await GApi.appendSheet(sheetId, 'Costs!A:H', [
-        [invDate, supplier, invNumber, total, vat, category, notes, driveFileId]
-      ]);
-
-      App.hideLoading();
-      App.showToast('Invoice saved successfully!', 'success');
-      this.reset();
-
-    } catch(e) {
-      App.hideLoading();
-      App.showToast('Error saving: ' + e.message, 'error');
-    }
-  },
-
-  reset() {
-    this.currentFile = null;
-    this.extractedData = null;
-    document.getElementById('costs-extraction-area').style.display = 'none';
-    document.getElementById('invoice-preview-container').style.display = 'none';
-    document.getElementById('extraction-loading').style.display = 'none';
-    document.getElementById('extraction-form').style.display = 'none';
-  },
-
-  async showHistory() {
-    App.showModal('modal-costs-history');
-    const container = document.getElementById('costs-history-list');
-    container.innerHTML = '<div class="text-muted">Loading…</div>';
-
-    const sheetId = State.get('sheetId');
-    if (!sheetId) {
-      container.innerHTML = '<div class="text-muted">No Sheet ID configured</div>';
-      return;
-    }
-
-    try {
-      const res = await GApi.getSheet(sheetId, 'Costs!A:G');
-      const rows = (res.values || []).slice(1).reverse().slice(0, 20);
-
-      if (rows.length === 0) {
-        container.innerHTML = '<div class="text-muted">No invoices yet</div>';
-        return;
-      }
-
-      container.innerHTML = rows.map(r => `
-        <div class="worker-summary-row">
-          <div>
-            <div style="font-weight:600">${this.escHtml(r[1] || '—')}</div>
-            <div class="text-muted">${r[0] || ''} · ${r[5] || ''}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-weight:700;color:var(--accent)">£${parseFloat(r[3]||0).toFixed(2)}</div>
-            <div class="text-muted" style="font-size:11px">${this.escHtml(r[2] || '')}</div>
-          </div>
-        </div>`).join('');
-    } catch(e) {
-      container.innerHTML = `<div class="text-muted">Error: ${e.message}</div>`;
-    }
-  },
-
-  fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const base64 = e.target.result.split(',')[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+      document.getElementById('extract-loading').style.display = 'none';
+      Costs._showForm(data);
+    }).catch(function (e) {
+      document.getElementById('extract-loading').style.display = 'none';
+      App.toast('AI extraction failed: ' + e.message, 'error');
+      Costs._showForm({});
     });
   },
 
-  escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  _showForm: function (d) {
+    document.getElementById('inv-supplier').value = d.supplier      || '';
+    document.getElementById('inv-number').value   = d.invoiceNumber || '';
+    document.getElementById('inv-date').value     = d.date          || new Date().toISOString().split('T')[0];
+    document.getElementById('inv-total').value    = d.total         || '';
+    document.getElementById('inv-vat').value      = d.vat           || '';
+    document.getElementById('inv-notes').value    = '';
+
+    var liSec  = document.getElementById('inv-lineitems');
+    var liBody = document.getElementById('inv-li-body');
+    if (d.lineItems && d.lineItems.length) {
+      liSec.style.display = 'block';
+      var html = '<table class="li-table"><thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead><tbody>';
+      d.lineItems.forEach(function (item) {
+        html += '<tr><td>' + esc(item.description || '') + '</td>' +
+          '<td style="text-align:right">&#163;' + (item.amount || 0).toFixed(2) + '</td></tr>';
+      });
+      liBody.innerHTML = html + '</tbody></table>';
+    } else {
+      liSec.style.display = 'none';
+    }
+    document.getElementById('extract-form').style.display = 'block';
+  },
+
+  confirmSave: function () {
+    var sheetId  = State.get('sheetId');
+    var folderId = State.get('folderId');
+    if (!sheetId) { App.toast('No Sheet ID configured', 'error'); return; }
+
+    var supplier = document.getElementById('inv-supplier').value.trim();
+    if (!supplier) { App.toast('Enter supplier name', 'error'); return; }
+
+    var invNum  = document.getElementById('inv-number').value.trim();
+    var invDate = document.getElementById('inv-date').value;
+    var total   = parseFloat(document.getElementById('inv-total').value) || 0;
+    var vat     = parseFloat(document.getElementById('inv-vat').value)   || 0;
+    var cat     = document.getElementById('inv-cat').value;
+    var notes   = document.getElementById('inv-notes').value.trim();
+
+    App.showLoading('Saving invoice&#8230;');
+
+    var drivePromise = (folderId && Costs.file)
+      ? (function () {
+          var ts   = new Date().toISOString().replace(/[:.]/g, '-');
+          var ext  = (Costs.file.name.split('.').pop() || 'jpg');
+          var name = 'INV_' + supplier.replace(/[^a-zA-Z0-9]/g, '_') + '_' + ts + '.' + ext;
+          return GApi.uploadToDrive(folderId, name, Costs.file, Costs.file.type)
+            .then(function (r) { return r.id || ''; })
+            .catch(function (e) {
+              App.toast('Drive upload failed — data still saved: ' + e.message, 'error');
+              return '';
+            });
+        })()
+      : Promise.resolve('');
+
+    drivePromise.then(function (driveId) {
+      return GApi.appendRows(sheetId, 'Costs!A:H',
+        [[invDate, supplier, invNum, total, vat, cat, notes, driveId]]);
+    }).then(function () {
+      App.hideLoading();
+      App.toast('Invoice saved!', 'success');
+      Costs.reset();
+    }).catch(function (e) {
+      App.hideLoading();
+      App.toast('Error: ' + e.message, 'error');
+    });
+  },
+
+  reset: function () {
+    Costs.file = null;
+    document.getElementById('costs-extract').style.display  = 'none';
+    document.getElementById('inv-preview').style.display    = 'none';
+    document.getElementById('extract-loading').style.display = 'none';
+    document.getElementById('extract-form').style.display   = 'none';
+  },
+
+  showHistory: function () {
+    App.openModal('modal-history');
+    var el = document.getElementById('history-list');
+    el.innerHTML = '<div class="text-muted">Loading&#8230;</div>';
+    var sheetId = State.get('sheetId');
+    if (!sheetId) { el.innerHTML = '<div class="text-muted">No Sheet ID configured</div>'; return; }
+
+    GApi.getRange(sheetId, 'Costs!A:G').then(function (res) {
+      var rows = (res.values || []).slice(1).reverse().slice(0, 20);
+      if (!rows.length) { el.innerHTML = '<div class="text-muted">No invoices yet</div>'; return; }
+      var html = '';
+      rows.forEach(function (r) {
+        html += '<div class="sum-row">' +
+          '<div><div style="font-weight:600">' + esc(r[1] || '—') + '</div>' +
+          '<div class="text-muted">' + esc(r[0] || '') + ' &middot; ' + esc(r[5] || '') + '</div></div>' +
+          '<div style="text-align:right">' +
+          '<div style="font-weight:700;color:var(--accent)">&#163;' + parseFloat(r[3] || 0).toFixed(2) + '</div>' +
+          '<div class="text-muted" style="font-size:11px">' + esc(r[2] || '') + '</div>' +
+          '</div></div>';
+      });
+      el.innerHTML = html;
+    }).catch(function (e) {
+      el.innerHTML = '<div class="text-muted">Error: ' + esc(e.message) + '</div>';
+    });
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// DASHBOARD MODULE
-// ═══════════════════════════════════════════════════════
-const Dashboard = {
-  async load() {
+// ─────────────────────────────────────────────────────────────
+// DASHBOARD
+// ─────────────────────────────────────────────────────────────
+var Dashboard = {
+  load: function () {
     if (!State.isSignedIn) {
-      const hasClientId = !!State.get('clientId');
-      document.getElementById('dash-categories').innerHTML = '';
-      document.getElementById('dash-workers-list').innerHTML = '';
-      // Show sign-in card in the stat area
-      document.getElementById('dash-total-spend').textContent = '—';
-      document.getElementById('dash-labour-cost').textContent = '—';
-      document.getElementById('dash-days').textContent = '—';
-      document.getElementById('dash-workers').textContent = '—';
-      document.getElementById('budget-card').style.display = 'none';
-      document.getElementById('dashboard-updated').textContent = hasClientId
-        ? 'Sign in to load data'
-        : 'Configure Settings to get started';
-      // Inline sign-in card below stats
-      const existing = document.getElementById('dash-signin-card');
-      if (!existing) {
-        const card = document.createElement('div');
-        card.id = 'dash-signin-card';
-        card.className = 'signin-card';
-        card.style.marginBottom = '12px';
-        card.innerHTML = hasClientId
-          ? `<div class="auth-logo">🔒</div>
-             <div class="auth-title">Sign in required</div>
-             <div class="auth-sub">Sign in with Google to view the dashboard.</div>
-             <button class="btn btn-primary" onclick="App.signIn()" style="max-width:260px">
-               <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
-               Sign in with Google
-             </button>`
-          : `<div class="auth-logo">⚙️</div>
-             <div class="auth-title">Setup required</div>
-             <div class="auth-sub">Enter your Google Client ID in Settings to get started.</div>
-             <button class="btn btn-secondary" onclick="App.switchTab('settings')" style="max-width:260px">Go to Settings</button>`;
-        // Insert before the category card
-        const catCard = document.querySelector('#screen-dashboard .card');
-        catCard.parentNode.insertBefore(card, catCard);
-      }
+      document.getElementById('dash-updated').textContent = '— not signed in';
+      ['ds-spend','ds-labour','ds-days','ds-workers'].forEach(function (id) {
+        document.getElementById(id).textContent = '—';
+      });
+      document.getElementById('ds-budget-card').style.display = 'none';
+      document.getElementById('ds-cats').innerHTML     = signinCard('Dashboard');
+      document.getElementById('ds-wsummary').innerHTML = '';
       return;
     }
-    // Remove sign-in card if present (user just signed in)
-    const signinCard = document.getElementById('dash-signin-card');
-    if (signinCard) signinCard.remove();
+    var sheetId = State.get('sheetId');
+    if (!sheetId) { App.toast('Add Sheet ID in Settings', 'error'); return; }
 
-    const sheetId = State.get('sheetId');
-    if (!sheetId) {
-      App.showToast('Configure Sheet ID in Settings', 'error');
-      return;
-    }
+    App.showLoading('Loading dashboard&#8230;');
+    document.getElementById('dash-updated').textContent = 'Refreshing&#8230;';
 
-    App.showLoading('Loading dashboard…');
-    document.getElementById('dashboard-updated').textContent = 'Refreshing…';
+    Promise.all([
+      GApi.getRange(sheetId, 'Labour!A:F'),
+      GApi.getRange(sheetId, 'Costs!A:H'),
+      GApi.getRange(sheetId, 'Workers!A:E')
+    ]).then(function (results) {
+      var labourRows  = (results[0].values || []).slice(1);
+      var costsRows   = (results[1].values || []).slice(1);
+      var workerRows  = (results[2].values || []).slice(1);
 
-    try {
-      const [labourRes, costsRes, workersRes] = await Promise.all([
-        GApi.getSheet(sheetId, 'Labour!A:F'),
-        GApi.getSheet(sheetId, 'Costs!A:H'),
-        GApi.getSheet(sheetId, 'Workers!A:E')
-      ]);
-
-      const labourRows = (labourRes.values || []).slice(1);
-      const costsRows = (costsRes.values || []).slice(1);
-      const workerRows = (workersRes.values || []).slice(1);
-
-      // Labour stats
-      let totalLabour = 0;
-      const uniqueDays = new Set();
-      const workerTotals = {};
-      const workerDays = {};
-
-      labourRows.forEach(r => {
-        if (r[3] === 'Present') {
-          const pay = parseFloat(r[5]) || 0;
-          totalLabour += pay;
-          uniqueDays.add(r[0]);
-          const name = r[1];
-          workerTotals[name] = (workerTotals[name] || 0) + pay;
-          workerDays[name] = (workerDays[name] || 0) + 1;
-        }
+      var totalLabour = 0;
+      var uniqueDays  = {};
+      var wTotals     = {};
+      var wDays       = {};
+      labourRows.forEach(function (r) {
+        if (r[3] !== 'Present') return;
+        var pay = parseFloat(r[5]) || 0;
+        totalLabour += pay;
+        uniqueDays[r[0]] = 1;
+        var n = r[1];
+        wTotals[n] = (wTotals[n] || 0) + pay;
+        wDays[n]   = (wDays[n]   || 0) + 1;
       });
 
-      // Costs stats
-      let totalCosts = 0;
-      const categoryTotals = {};
-      costsRows.forEach(r => {
-        const amount = parseFloat(r[3]) || 0;
-        totalCosts += amount;
-        const cat = r[5] || 'Other';
-        categoryTotals[cat] = (categoryTotals[cat] || 0) + amount;
+      var totalCosts = 0;
+      var catTotals  = {};
+      costsRows.forEach(function (r) {
+        var amt = parseFloat(r[3]) || 0;
+        totalCosts += amt;
+        var cat = r[5] || 'Other';
+        catTotals[cat] = (catTotals[cat] || 0) + amt;
       });
 
-      const totalSpend = totalLabour + totalCosts;
-      const activeWorkers = workerRows.filter(r => r[4] !== 'FALSE').length;
+      var totalSpend   = totalLabour + totalCosts;
+      var activeWorkers = workerRows.filter(function (r) { return r[4] !== 'FALSE'; }).length;
+      var daysCount     = Object.keys(uniqueDays).length;
 
-      // Update stats
-      document.getElementById('dash-total-spend').textContent = `£${totalSpend.toLocaleString('en-GB', {minimumFractionDigits:0,maximumFractionDigits:0})}`;
-      document.getElementById('dash-labour-cost').textContent = `£${totalLabour.toLocaleString('en-GB', {minimumFractionDigits:0,maximumFractionDigits:0})}`;
-      document.getElementById('dash-days').textContent = uniqueDays.size;
-      document.getElementById('dash-workers').textContent = activeWorkers;
+      document.getElementById('ds-spend').innerHTML   = fmtGBP(totalSpend);
+      document.getElementById('ds-labour').innerHTML  = fmtGBP(totalLabour);
+      document.getElementById('ds-days').textContent  = daysCount;
+      document.getElementById('ds-workers').textContent = activeWorkers;
 
       // Budget
-      const budget = parseFloat(State.get('budget'));
-      const budgetCard = document.getElementById('budget-card');
+      var budget     = parseFloat(State.get('budget'));
+      var budgetCard = document.getElementById('ds-budget-card');
       if (budget > 0) {
         budgetCard.style.display = 'block';
-        const pct = Math.min((totalSpend / budget) * 100, 100);
-        document.getElementById('dash-budget-spent').textContent = `£${totalSpend.toLocaleString('en-GB')}`;
-        document.getElementById('dash-budget-total').textContent = `£${budget.toLocaleString('en-GB')}`;
-        document.getElementById('dash-budget-remaining').textContent =
-          `£${Math.max(budget - totalSpend, 0).toLocaleString('en-GB')} remaining`;
-        const bar = document.getElementById('budget-bar-fill');
+        var pct = Math.min((totalSpend / budget) * 100, 100);
+        document.getElementById('ds-bspent').innerHTML = fmtGBP(totalSpend);
+        document.getElementById('ds-btotal').innerHTML = fmtGBP(budget);
+        document.getElementById('ds-brem').innerHTML   = fmtGBP(Math.max(budget - totalSpend, 0)) + ' remaining';
+        var bar = document.getElementById('ds-bbar');
         bar.style.width = pct + '%';
-        bar.className = 'budget-bar-fill' + (pct > 90 ? ' danger' : pct > 70 ? ' warning' : '');
+        bar.className   = 'bbar-fill' + (pct > 90 ? ' danger' : pct > 70 ? ' warn' : '');
       } else {
         budgetCard.style.display = 'none';
       }
 
       // Categories
-      const catContainer = document.getElementById('dash-categories');
-      const maxCat = Math.max(...Object.values(categoryTotals), 1);
-      if (Object.keys(categoryTotals).length === 0) {
-        catContainer.innerHTML = '<div class="text-muted" style="padding:8px 0">No cost data yet</div>';
+      var catKeys = Object.keys(catTotals);
+      if (catKeys.length === 0) {
+        document.getElementById('ds-cats').innerHTML = '<div class="text-muted">No cost data yet</div>';
       } else {
-        catContainer.innerHTML = Object.entries(categoryTotals)
-          .sort((a,b) => b[1]-a[1])
-          .map(([cat, amt]) => `
-            <div class="category-row">
-              <div style="min-width:120px;font-size:13px">${cat}</div>
-              <div class="category-bar"><div class="category-bar-fill" style="width:${(amt/maxCat*100).toFixed(1)}%"></div></div>
-              <div style="font-size:13px;font-weight:600;min-width:70px;text-align:right">£${amt.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
-            </div>`).join('');
+        catKeys.sort(function (a, b) { return catTotals[b] - catTotals[a]; });
+        var maxC = catTotals[catKeys[0]] || 1;
+        var html = '';
+        catKeys.forEach(function (c) {
+          html += '<div class="cat-row">' +
+            '<div class="cat-name">' + esc(c) + '</div>' +
+            '<div class="cat-bar"><div class="cat-bar-fill" style="width:' +
+              ((catTotals[c] / maxC) * 100).toFixed(1) + '%"></div></div>' +
+            '<div class="cat-amt">' + fmtGBP(catTotals[c]) + '</div>' +
+          '</div>';
+        });
+        document.getElementById('ds-cats').innerHTML = html;
       }
 
-      // Worker summary
-      const wContainer = document.getElementById('dash-workers-list');
-      if (Object.keys(workerTotals).length === 0) {
-        wContainer.innerHTML = '<div class="text-muted" style="padding:8px 0">No labour data yet</div>';
+      // Workers
+      var wKeys = Object.keys(wTotals);
+      if (wKeys.length === 0) {
+        document.getElementById('ds-wsummary').innerHTML = '<div class="text-muted">No labour data yet</div>';
       } else {
-        wContainer.innerHTML = Object.entries(workerTotals)
-          .sort((a,b) => b[1]-a[1])
-          .map(([name, total]) => `
-            <div class="worker-summary-row">
-              <div>
-                <div style="font-weight:600">${name}</div>
-                <div class="text-muted">${workerDays[name]} day${workerDays[name]!==1?'s':''}</div>
-              </div>
-              <div style="font-weight:700;color:var(--accent)">£${total.toFixed(2)}</div>
-            </div>`).join('');
+        wKeys.sort(function (a, b) { return wTotals[b] - wTotals[a]; });
+        var whtml = '';
+        wKeys.forEach(function (n) {
+          whtml += '<div class="sum-row">' +
+            '<div><div style="font-weight:600">' + esc(n) + '</div>' +
+            '<div class="text-muted">' + wDays[n] + ' day' + (wDays[n] !== 1 ? 's' : '') + '</div></div>' +
+            '<div style="font-weight:700;color:var(--accent)">&#163;' + wTotals[n].toFixed(2) + '</div>' +
+          '</div>';
+        });
+        document.getElementById('ds-wsummary').innerHTML = whtml;
       }
 
-      document.getElementById('dashboard-updated').textContent =
-        `Updated ${new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'})}`;
-
+      document.getElementById('dash-updated').textContent =
+        'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
       App.hideLoading();
-    } catch(e) {
+    }).catch(function (e) {
       App.hideLoading();
-      App.showToast('Error loading dashboard: ' + e.message, 'error');
-    }
+      App.toast('Error: ' + e.message, 'error');
+    });
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// EXPOSE GLOBALS
-// ═══════════════════════════════════════════════════════
-// const-declared variables at module/script scope are not automatically
-// placed on window in all browsers (notably WebKit/Safari on iOS).
-// Inline onclick handlers need these on window, so assign them explicitly.
+// ─────────────────────────────────────────────────────────────
+// EXPOSE TO GLOBAL SCOPE
+// (const/let at script scope are NOT on window in Safari/WebKit;
+//  inline onclick handlers need these on window)
+// ─────────────────────────────────────────────────────────────
 window.App       = App;
 window.Labour    = Labour;
 window.Costs     = Costs;
 window.Dashboard = Dashboard;
 window.Settings  = Settings;
+window.State     = State;
 
-// ═══════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
 // BOOT
-// ═══════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => App.init());
+// ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () { App.init(); });
 </script>
 </body>
 </html>
