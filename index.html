@@ -10,128 +10,61 @@
 <title>Solar Farm Site Ops</title>
 <style>
 :root {
-  --bg:         #0f0f1a;
-  --surface:    #1a1a2e;
-  --surface2:   #16213e;
-  --accent:     #f5a623;
-  --green:      #27ae60;
-  --red:        #e74c3c;
-  --blue:       #3498db;
-  --text:       #f0f0f0;
-  --muted:      #9a9ab0;
-  --border:     #2a2a45;
-  --radius:     12px;
-  --tab-h:      68px;
-  --safe-b:     env(safe-area-inset-bottom, 0px);
-  --safe-t:     env(safe-area-inset-top, 0px);
+  --bg:       #0f0f1a;
+  --surface:  #1a1a2e;
+  --surface2: #16213e;
+  --accent:   #f5a623;
+  --green:    #27ae60;
+  --red:      #e74c3c;
+  --blue:     #3498db;
+  --text:     #f0f0f0;
+  --muted:    #9a9ab0;
+  --border:   #2a2a45;
+  --radius:   12px;
+  --tab-h:    68px;
+  --safe-b:   env(safe-area-inset-bottom, 0px);
+  --safe-t:   env(safe-area-inset-top, 0px);
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
+  background: var(--bg); color: var(--text);
+  height: 100vh; height: 100dvh; overflow: hidden;
 }
-
-/* ── App shell ── */
-#app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-}
-
+#app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 #header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: var(--surface); border-bottom: 1px solid var(--border);
   padding: calc(14px + var(--safe-t)) 20px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; z-index: 10;
 }
-
-#header h1      { font-size: 18px; font-weight: 700; color: var(--accent); }
-#header .sub    { font-size: 12px; color: var(--muted); margin-top: 1px; }
-#auth-badge     { display: flex; align-items: center; gap: 7px; font-size: 13px; }
-#auth-badge .dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex-shrink: 0;
-}
+#header h1   { font-size: 18px; font-weight: 700; color: var(--accent); }
+#header .sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+#auth-badge  { display: flex; align-items: center; gap: 7px; font-size: 13px; }
+#auth-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
 #auth-badge .dot.on { background: var(--green); }
-
-#content {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ── Tab bar ── */
+#content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 #tab-bar {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  display: flex;
-  flex-shrink: 0;
-  padding-bottom: var(--safe-b);
-  z-index: 20;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; flex-shrink: 0; padding-bottom: var(--safe-b); z-index: 20;
 }
-
 .tab-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  padding: 8px 4px;
-  border: none;
-  background: none;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  min-height: var(--tab-h);
-  -webkit-appearance: none;
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px; padding: 8px 4px; border: none;
+  background: none; color: var(--muted); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.5px; cursor: pointer; min-height: var(--tab-h); -webkit-appearance: none;
 }
-.tab-btn svg {
-  width: 22px; height: 22px;
-  stroke: currentColor; fill: none;
-  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-}
+.tab-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .tab-btn.active { color: var(--accent); }
-
-/* ── Screens ── */
 .screen { display: none; padding: 16px; padding-bottom: 28px; }
 .screen.active { display: block; }
-
-/* ── Cards ── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 12px;
-}
-.card-title {
-  font-size: 12px; font-weight: 700;
-  color: var(--muted); text-transform: uppercase;
-  letter-spacing: 0.8px; margin-bottom: 12px;
-}
-
-/* ── Buttons ── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.card-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
-  gap: 8px; padding: 14px 18px;
-  border-radius: var(--radius); border: none;
-  font-size: 15px; font-weight: 600;
-  cursor: pointer; width: 100%;
-  -webkit-appearance: none;
-  transition: opacity 0.15s;
+  gap: 8px; padding: 14px 18px; border-radius: var(--radius); border: none;
+  font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
+  -webkit-appearance: none; transition: opacity 0.15s;
 }
 .btn:active { opacity: 0.75; }
 .btn-primary   { background: var(--accent); color: #000; }
@@ -139,69 +72,50 @@ body {
 .btn-success   { background: var(--green); color: #fff; }
 .btn-danger    { background: var(--red); color: #fff; }
 .btn-sm        { padding: 9px 14px; font-size: 13px; width: auto; }
-
-/* ── Forms ── */
 .form-group  { margin-bottom: 14px; }
-.form-label  {
-  display: block; font-size: 11px; font-weight: 700;
-  color: var(--muted); text-transform: uppercase;
-  letter-spacing: 0.5px; margin-bottom: 6px;
-}
+.form-label  { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
 .form-input, .form-select {
-  width: 100%; padding: 13px 14px;
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 10px; color: var(--text);
-  font-size: 16px; outline: none;
-  -webkit-appearance: none; appearance: none;
-  transition: border-color 0.15s;
+  width: 100%; padding: 13px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text); font-size: 16px; outline: none;
+  -webkit-appearance: none; appearance: none; transition: border-color 0.15s;
 }
 .form-input:focus, .form-select:focus { border-color: var(--accent); }
 .form-select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a9ab0' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
 }
-
-/* ── Sign-in card (inline, shown inside each screen when not authed) ── */
 .signin-card {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 14px; text-align: center;
-  padding: 36px 24px; margin-top: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  text-align: center; padding: 36px 24px; margin-top: 8px;
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
 }
-.signin-card .sc-icon { font-size: 44px; }
+.signin-card .sc-icon  { font-size: 44px; }
 .signin-card .sc-title { font-size: 17px; font-weight: 700; }
 .signin-card .sc-sub   { font-size: 13px; color: var(--muted); max-width: 280px; line-height: 1.5; }
 .signin-card .btn      { max-width: 260px; }
-
-/* ── Date nav ── */
 .date-nav {
   display: flex; align-items: center; gap: 8px;
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 12px; margin-bottom: 14px;
 }
-.date-nav .dn-mid     { flex: 1; text-align: center; }
-.date-nav .dn-main    { font-size: 16px; font-weight: 600; }
-.date-nav .dn-sub     { font-size: 12px; color: var(--muted); }
+.date-nav .dn-mid  { flex: 1; text-align: center; }
+.date-nav .dn-main { font-size: 16px; font-weight: 600; }
+.date-nav .dn-sub  { font-size: 12px; color: var(--muted); }
 .date-nav-btn {
-  background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text); border-radius: 8px;
-  width: 44px; height: 44px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0;
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
 }
 .date-nav-btn:active { opacity: 0.7; }
-
-/* ── Worker row ── */
 .worker-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 13px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--radius);
-  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px; padding: 13px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 8px;
 }
-.worker-info      { flex: 1; }
-.worker-name      { font-size: 16px; font-weight: 600; }
-.worker-meta      { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.att-wrap         { display: flex; gap: 6px; }
+.worker-info    { flex: 1; }
+.worker-name    { font-size: 16px; font-weight: 600; }
+.worker-meta    { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.att-wrap       { display: flex; gap: 6px; }
 .att-btn {
   width: 52px; height: 44px; border-radius: 8px;
   border: 2px solid var(--border); background: var(--surface2);
@@ -209,107 +123,57 @@ body {
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all 0.12s;
 }
-.att-btn.present  { background: var(--green); border-color: var(--green); color: #fff; }
-.att-btn.absent   { background: var(--red);   border-color: var(--red);   color: #fff; }
-
-/* ── Stats grid ── */
+.att-btn.present { background: var(--green); border-color: var(--green); color: #fff; }
+.att-btn.absent  { background: var(--red);   border-color: var(--red);   color: #fff; }
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
 .stat-val  { font-size: 22px; font-weight: 800; color: var(--accent); }
 .stat-lbl  { font-size: 11px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-/* ── Budget bar ── */
 .bbar      { background: var(--surface2); border-radius: 6px; height: 10px; overflow: hidden; margin-top: 8px; }
 .bbar-fill { height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.4s; }
 .bbar-fill.warn   { background: #e67e22; }
 .bbar-fill.danger { background: var(--red); }
-
-/* ── Category row ── */
-.cat-row { display: flex; align-items: center; padding: 7px 0; }
+.cat-row  { display: flex; align-items: center; padding: 7px 0; }
 .cat-name { min-width: 130px; font-size: 13px; }
 .cat-bar  { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; margin: 0 10px; overflow: hidden; }
 .cat-bar-fill { height: 100%; background: var(--blue); border-radius: 3px; }
 .cat-amt  { font-size: 13px; font-weight: 600; min-width: 66px; text-align: right; }
-
-/* ── Summary row ── */
-.sum-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 11px 0; border-bottom: 1px solid var(--border);
-}
+.sum-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); }
 .sum-row:last-child { border-bottom: none; }
-
-/* ── Invoice ── */
 .upload-zone {
   border: 2px dashed var(--border); border-radius: var(--radius);
-  padding: 32px 20px; text-align: center; cursor: pointer;
-  margin-bottom: 14px;
+  padding: 32px 20px; text-align: center; cursor: pointer; margin-bottom: 14px;
 }
 .upload-zone:active { border-color: var(--accent); }
 .uz-icon { font-size: 40px; margin-bottom: 8px; }
 .uz-head { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
 .uz-sub  { font-size: 13px; color: var(--muted); }
-
-.inv-preview {
-  background: var(--surface2); border-radius: var(--radius);
-  padding: 12px; margin-bottom: 12px;
-}
+.inv-preview { background: var(--surface2); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; }
 .inv-preview img { width: 100%; border-radius: 8px; max-height: 200px; object-fit: contain; }
-
 .li-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .li-table th { text-align: left; padding: 7px 8px; color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 600; }
 .li-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); }
-
-/* ── Spinner / overlay ── */
-.spinner {
-  width: 32px; height: 32px;
-  border: 3px solid var(--border); border-top-color: var(--accent);
-  border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto;
-}
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-#loading-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.72);
-  display: none; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 16px; z-index: 200;
-}
+#loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 200; }
 #loading-overlay p { font-size: 15px; }
-
-/* ── Toast ── */
 #toast {
-  position: fixed;
-  bottom: calc(var(--tab-h) + 14px + var(--safe-b));
+  position: fixed; bottom: calc(var(--tab-h) + 14px + var(--safe-b));
   left: 50%; transform: translateX(-50%) translateY(16px);
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 24px; padding: 11px 20px;
-  font-size: 14px; font-weight: 600;
-  z-index: 300; opacity: 0; pointer-events: none;
-  white-space: nowrap; max-width: 92vw;
+  border-radius: 24px; padding: 11px 20px; font-size: 14px; font-weight: 600;
+  z-index: 300; opacity: 0; pointer-events: none; white-space: nowrap; max-width: 92vw;
   transition: opacity 0.2s, transform 0.2s;
 }
 #toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
 #toast.success { border-color: var(--green); color: var(--green); }
 #toast.error   { border-color: var(--red);   color: var(--red); }
 #toast.info    { border-color: var(--accent); color: var(--accent); }
-
-/* ── Modal ── */
-.modal-back {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.76);
-  display: none; align-items: flex-end; z-index: 100;
-}
+.modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.76); display: none; align-items: flex-end; z-index: 100; }
 .modal-back.open { display: flex; }
-.modal-box {
-  background: var(--surface); border-radius: 20px 20px 0 0;
-  padding: 20px; padding-bottom: calc(20px + var(--safe-b));
-  width: 100%; max-height: 88vh; overflow-y: auto;
-  border-top: 1px solid var(--border);
-}
+.modal-box { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px; padding-bottom: calc(20px + var(--safe-b)); width: 100%; max-height: 88vh; overflow-y: auto; border-top: 1px solid var(--border); }
 .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
 .modal-title  { font-size: 18px; font-weight: 700; margin-bottom: 18px; }
-
-/* ── Misc ── */
 .divider    { height: 1px; background: var(--border); margin: 16px 0; }
 .text-muted { color: var(--muted); font-size: 13px; }
 .text-center { text-align: center; }
@@ -317,23 +181,24 @@ body {
 .mt-12 { margin-top: 12px; }
 .badge       { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; }
 .badge-green { background: rgba(39,174,96,0.18); color: var(--green); }
-
 .empty-state { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 14px; }
 .empty-icon  { font-size: 38px; margin-bottom: 8px; }
-
 #labour-save-btn { position: sticky; bottom: 14px; margin-top: 14px; z-index: 5; }
-
-.settings-section-title {
-  font-size: 11px; font-weight: 700; color: var(--muted);
-  text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
-}
+.settings-section-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
 .settings-section { margin-bottom: 24px; }
+/* Worker summary with payments */
+.worker-summary-block { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.worker-summary-block:last-child { border-bottom: none; }
+.wsb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.wsb-totals { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.wsb-cell { background: var(--surface2); border-radius: 8px; padding: 8px 6px; text-align: center; }
+.wsb-cell-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.wsb-cell-val { font-size: 14px; font-weight: 700; }
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- Header -->
   <div id="header">
     <div>
       <h1>&#9889; Solar Ops</h1>
@@ -345,7 +210,6 @@ body {
     </div>
   </div>
 
-  <!-- Scrollable content -->
   <div id="content">
 
     <!-- LABOUR -->
@@ -355,8 +219,8 @@ body {
           <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="dn-mid">
-          <div class="dn-main" id="labour-date-main">—</div>
-          <div class="dn-sub"  id="labour-date-sub">—</div>
+          <div class="dn-main" id="labour-date-main">&#8212;</div>
+          <div class="dn-sub"  id="labour-date-sub">&#8212;</div>
         </div>
         <button class="date-nav-btn" id="labour-next-btn" onclick="Labour.nextDay()">
           <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
@@ -370,7 +234,7 @@ body {
       <button class="btn btn-secondary" onclick="Labour.showAddWorker()">+ Add New Worker</button>
       <div class="divider"></div>
       <div id="labour-totals-card" class="card" style="display:none">
-        <div class="card-title">Worker Totals (All Time)</div>
+        <div class="card-title">Worker Summary</div>
         <div id="labour-totals"></div>
       </div>
     </div>
@@ -400,7 +264,7 @@ body {
           </div>
           <div id="extract-form" style="display:none">
             <div class="card">
-              <div class="card-title">Review &amp; Edit — then confirm</div>
+              <div class="card-title">Review &amp; Edit &#8212; then confirm</div>
               <div class="form-group">
                 <label class="form-label">Supplier</label>
                 <input type="text" id="inv-supplier" class="form-input" placeholder="Supplier name">
@@ -415,18 +279,15 @@ body {
               </div>
               <div class="form-group">
                 <label class="form-label">Amount Ex VAT (R)</label>
-                <input type="number" id="inv-exvat" class="form-input" step="0.01" placeholder="0.00"
-                       oninput="Costs.calcVat()">
+                <input type="number" id="inv-exvat" class="form-input" step="0.01" placeholder="0.00" oninput="Costs.calcVat()">
               </div>
               <div class="form-group">
                 <label class="form-label">VAT @ 15% (R)</label>
-                <input type="number" id="inv-vat" class="form-input" step="0.01" placeholder="0.00"
-                       oninput="Costs.calcTotal()">
+                <input type="number" id="inv-vat" class="form-input" step="0.01" placeholder="0.00" oninput="Costs.calcTotal()">
               </div>
               <div class="form-group">
                 <label class="form-label">Total Inc VAT (R)</label>
-                <input type="number" id="inv-total" class="form-input" step="0.01" placeholder="0.00" readonly
-                       style="opacity:0.7;cursor:default">
+                <input type="number" id="inv-total" class="form-input" step="0.01" placeholder="0.00" readonly style="opacity:0.7;cursor:default">
               </div>
               <div class="form-group">
                 <label class="form-label">Category</label>
@@ -462,34 +323,34 @@ body {
     <div id="screen-dashboard" class="screen">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div style="font-size:18px;font-weight:700">Dashboard</div>
-        <div class="text-muted" id="dash-updated" style="font-size:12px">—</div>
+        <div class="text-muted" id="dash-updated" style="font-size:12px">&#8212;</div>
       </div>
       <div class="stat-grid">
-        <div class="stat-card"><div class="stat-val" id="ds-spend">—</div><div class="stat-lbl">Total Spend Ex VAT</div></div>
-        <div class="stat-card"><div class="stat-val" id="ds-labour">—</div><div class="stat-lbl">Labour Cost Ex VAT</div></div>
-        <div class="stat-card"><div class="stat-val" id="ds-days">—</div><div class="stat-lbl">Working Days</div></div>
-        <div class="stat-card"><div class="stat-val" id="ds-workers">—</div><div class="stat-lbl">Active Workers</div></div>
+        <div class="stat-card"><div class="stat-val" id="ds-spend">&#8212;</div><div class="stat-lbl">Total Spend Ex VAT</div></div>
+        <div class="stat-card"><div class="stat-val" id="ds-labour">&#8212;</div><div class="stat-lbl">Labour Cost</div></div>
+        <div class="stat-card"><div class="stat-val" id="ds-days">&#8212;</div><div class="stat-lbl">Working Days</div></div>
+        <div class="stat-card"><div class="stat-val" id="ds-workers">&#8212;</div><div class="stat-lbl">Active Workers</div></div>
       </div>
       <div class="card" id="ds-vat-card">
         <div style="display:flex;align-items:center;justify-content:space-between">
           <div>
-            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">VAT Total (15%) — cashflow ref</div>
-            <div class="stat-val" id="ds-vat" style="margin-top:4px">—</div>
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">VAT Total (15%) &#8212; cashflow ref</div>
+            <div class="stat-val" id="ds-vat" style="margin-top:4px">&#8212;</div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Total Inc VAT</div>
-            <div style="font-size:18px;font-weight:700;margin-top:4px" id="ds-incvat">—</div>
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Total Inc VAT</div>
+            <div style="font-size:18px;font-weight:700;margin-top:4px" id="ds-incvat">&#8212;</div>
           </div>
         </div>
       </div>
       <div id="ds-budget-card" class="card" style="display:none">
-        <div class="card-title">Budget</div>
+        <div class="card-title">Budget vs Spend (Ex VAT)</div>
         <div style="display:flex;align-items:center;justify-content:space-between">
-          <span id="ds-bspent">—</span>
-          <span class="text-muted">of <span id="ds-btotal">—</span></span>
+          <span id="ds-bspent">&#8212;</span>
+          <span class="text-muted">of <span id="ds-btotal">&#8212;</span></span>
         </div>
         <div class="bbar mt-8"><div class="bbar-fill" id="ds-bbar" style="width:0%"></div></div>
-        <div class="text-muted mt-8" id="ds-brem">—</div>
+        <div class="text-muted mt-8" id="ds-brem">&#8212;</div>
       </div>
       <div class="card">
         <div class="card-title">Spend by Category</div>
@@ -505,23 +366,18 @@ body {
     <!-- SETTINGS -->
     <div id="screen-settings" class="screen">
       <div style="font-size:18px;font-weight:700;margin-bottom:20px">Settings</div>
-
       <div class="settings-section">
         <div class="settings-section-title">Google Account</div>
         <div class="form-group">
           <label class="form-label">Google OAuth Client ID</label>
-          <input type="text" id="s-client-id" class="form-input"
-                 placeholder="xxxxxxxxx.apps.googleusercontent.com" autocomplete="off">
-          <p class="text-muted" style="margin-top:6px">
-            Get this from Google Cloud Console &#8594; APIs &amp; Services &#8594; Credentials
-          </p>
+          <input type="text" id="s-client-id" class="form-input" placeholder="xxxxxxxxx.apps.googleusercontent.com" autocomplete="off">
+          <p class="text-muted" style="margin-top:6px">Get this from Google Cloud Console &#8594; APIs &amp; Services &#8594; Credentials</p>
         </div>
         <div id="s-auth-info" class="card" style="margin-bottom:12px">
           <div class="text-muted">Not signed in</div>
         </div>
         <button class="btn btn-secondary" id="s-auth-btn" onclick="App.signIn()">Sign in with Google</button>
       </div>
-
       <div class="settings-section">
         <div class="settings-section-title">Project Config</div>
         <div class="form-group">
@@ -545,43 +401,31 @@ body {
           <input type="number" id="s-rate" class="form-input" placeholder="e.g. 1800">
         </div>
       </div>
-
       <div class="settings-section">
         <div class="settings-section-title">Anthropic API (Invoice Scanning)</div>
         <div class="form-group">
           <label class="form-label">API Key</label>
           <input type="password" id="s-api-key" class="form-input" placeholder="sk-ant-&#8230;" autocomplete="off">
         </div>
-        <p class="text-muted" style="margin-bottom:12px">
-          Used only for invoice scanning. Stored locally on this device only.
-        </p>
+        <p class="text-muted" style="margin-bottom:12px">Used only for invoice scanning. Stored locally on this device.</p>
       </div>
-
       <button class="btn btn-primary" onclick="Settings.save()">Save Settings</button>
-
       <div class="divider"></div>
-
       <div class="settings-section">
         <div class="settings-section-title">Sheet Setup</div>
-        <p class="text-muted" style="margin-bottom:12px">
-          First time? Automatically create the required tabs and headers in your Google Sheet.
-        </p>
+        <p class="text-muted" style="margin-bottom:12px">First time? Creates all required tabs, removes Sheet1, applies formatting.</p>
         <button class="btn btn-secondary" onclick="Settings.initSheet()">Initialise Google Sheet</button>
       </div>
-
       <div class="divider"></div>
-
       <div class="settings-section">
         <div class="settings-section-title">Danger Zone</div>
         <button class="btn btn-danger" onclick="Settings.signOut()">Sign Out of Google</button>
       </div>
-
       <p class="text-muted text-center" style="font-size:11px;margin-top:12px">Solar Ops v1.0</p>
     </div>
 
   </div><!-- /#content -->
 
-  <!-- Tab bar -->
   <div id="tab-bar">
     <button class="tab-btn" id="tab-labour"    onclick="App.switchTab('labour')">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -603,13 +447,10 @@ body {
 
 </div><!-- /#app -->
 
-<!-- Loading overlay -->
 <div id="loading-overlay">
   <div class="spinner"></div>
   <p id="loading-text">Loading&#8230;</p>
 </div>
-
-<!-- Toast -->
 <div id="toast"></div>
 
 <!-- Add Worker modal -->
@@ -626,7 +467,7 @@ body {
       <input type="date" id="nw-date" class="form-input">
     </div>
     <div class="form-group">
-      <label class="form-label">Daily Rate Ex VAT (R) — leave blank for default</label>
+      <label class="form-label">Daily Rate (R) &#8212; leave blank for default</label>
       <input type="number" id="nw-rate" class="form-input" placeholder="Leave blank for default">
     </div>
     <button class="btn btn-primary" onclick="Labour.addWorker()" style="margin-bottom:8px">Add Worker</button>
@@ -644,138 +485,207 @@ body {
   </div>
 </div>
 
+<!-- Record Payment modal -->
+<div id="modal-pay-worker" class="modal-back" onclick="if(event.target===this)App.closeModal('modal-pay-worker')">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Record Payment</div>
+    <div class="form-group">
+      <label class="form-label">Worker</label>
+      <div id="pay-worker-display" style="font-size:17px;font-weight:700;padding:6px 0 10px"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Payment Date</label>
+      <input type="date" id="pay-date" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Amount Paid (R)</label>
+      <input type="number" id="pay-amount" class="form-input" step="0.01" placeholder="0.00">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Payment Method</label>
+      <select id="pay-method" class="form-select">
+        <option>Cash</option>
+        <option>EFT</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes (optional)</label>
+      <input type="text" id="pay-notes" class="form-input" placeholder="e.g. Week 3 wages">
+    </div>
+    <button class="btn btn-success" onclick="Payments.save()" style="margin-bottom:8px">&#10003; Record Payment</button>
+    <button class="btn btn-secondary" onclick="App.closeModal('modal-pay-worker')">Cancel</button>
+  </div>
+</div>
+
 <script>
+// ─────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────
+
+// Return YYYY-MM-DD using LOCAL (SAST) date components — NOT UTC.
+// toISOString() always returns UTC which is 2h behind SAST and gives wrong date.
+function localIsoDate(d) {
+  var y  = d.getFullYear();
+  var m  = String(d.getMonth() + 1).padStart(2, '0');
+  var dy = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + dy;
+}
+
+// String.prototype.padStart polyfill-style via function for older Safari
+String.prototype.padStart = String.prototype.padStart || function(len, fill) {
+  var s = String(this);
+  while (s.length < len) s = (fill || ' ') + s;
+  return s;
+};
+
+// Normalise any date representation the Sheets API might return to YYYY-MM-DD.
+// Google Sheets may return dates as "15/01/2024" (ZA locale), "2024-01-15",
+// "01/15/2024" (US) or even a serial number string.
+function normalizeDate(v) {
+  if (!v) return '';
+  var s = String(v).trim();
+  if (!s) return '';
+  // Already ISO: YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // DD/MM/YYYY (ZA / UK)
+  var m1 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m1 && parseInt(m1[1]) > 12) {
+    return m1[3] + '-' + m1[2].padStart(2,'0') + '-' + m1[1].padStart(2,'0');
+  }
+  // MM/DD/YYYY (US) — only when day part >12 disambiguates; else treat as DD/MM
+  if (m1) {
+    return m1[3] + '-' + m1[2].padStart(2,'0') + '-' + m1[1].padStart(2,'0');
+  }
+  // Sheets serial number (integer days since 30-Dec-1899)
+  if (/^\d+$/.test(s)) {
+    var serial = parseInt(s, 10);
+    var epoch  = new Date((serial - 25569) * 86400000);
+    return localIsoDate(epoch);
+  }
+  return s;
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtR(n) {
+  return 'R' + Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function signinCard(feature) {
+  var hasId = !!State.get('clientId');
+  return '<div class="signin-card">' +
+    '<div class="sc-icon">&#128274;</div>' +
+    '<div class="sc-title">Sign in required</div>' +
+    '<div class="sc-sub">' + (hasId
+      ? 'Sign in with Google to use ' + esc(feature) + '.'
+      : 'Add your Google Client ID in Settings, then sign in.') + '</div>' +
+    (hasId
+      ? '<button class="btn btn-primary" onclick="App.signIn()">' +
+          '<svg viewBox="0 0 24 24" width="18" height="18" style="stroke:none">' +
+          '<path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>' +
+          'Sign in with Google</button>'
+      : '<button class="btn btn-secondary" onclick="App.switchTab(\'settings\')">&#9881;&#65039; Go to Settings</button>') +
+    '</div>';
+}
+
 // ─────────────────────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────────────────────
 var State = {
   isSignedIn: false,
-  token: null,
+  token:      null,
   tokenExpiry: 0,
-  cfg: {},
+  cfg:        {},
 
   load: function () {
     try { this.cfg = JSON.parse(localStorage.getItem('solar_cfg') || '{}'); }
     catch (e) { this.cfg = {}; }
     var td = JSON.parse(localStorage.getItem('solar_token') || 'null');
     if (td && td.expiry > Date.now()) {
-      this.token = td.token;
-      this.tokenExpiry = td.expiry;
-      this.isSignedIn = true;
+      this.token = td.token; this.tokenExpiry = td.expiry; this.isSignedIn = true;
     }
   },
-
   saveToken: function (token, expiresIn) {
     var expiry = Date.now() + (expiresIn - 60) * 1000;
-    this.token = token;
-    this.tokenExpiry = expiry;
-    this.isSignedIn = true;
+    this.token = token; this.tokenExpiry = expiry; this.isSignedIn = true;
     localStorage.setItem('solar_token', JSON.stringify({ token: token, expiry: expiry }));
   },
-
   clearToken: function () {
-    this.token = null;
-    this.tokenExpiry = 0;
-    this.isSignedIn = false;
+    this.token = null; this.tokenExpiry = 0; this.isSignedIn = false;
     localStorage.removeItem('solar_token');
   },
-
-  saveCfg: function () {
-    localStorage.setItem('solar_cfg', JSON.stringify(this.cfg));
-  },
-
+  saveCfg: function () { localStorage.setItem('solar_cfg', JSON.stringify(this.cfg)); },
   get: function (k, def) {
     var v = this.cfg[k];
     return (v !== undefined && v !== null) ? v : (def !== undefined ? def : '');
   },
-
   set: function (k, v) { this.cfg[k] = v; }
 };
 
 // ─────────────────────────────────────────────────────────────
-// GOOGLE API HELPERS
+// GOOGLE API
 // ─────────────────────────────────────────────────────────────
 var GApi = {
-  _checkToken: function () {
+  _check: function () {
     if (!State.isSignedIn || !State.token) throw new Error('Not signed in');
     if (Date.now() > State.tokenExpiry - 30000) {
-      State.clearToken();
-      App.updateAuthUI();
+      State.clearToken(); App.updateAuthUI();
       throw new Error('Session expired — please sign in again');
     }
   },
-
   request: function (method, url, body) {
-    this._checkToken();
-    var opts = {
-      method: method,
-      headers: {
-        'Authorization': 'Bearer ' + State.token,
-        'Content-Type': 'application/json'
-      }
-    };
+    this._check();
+    var opts = { method: method, headers: { 'Authorization': 'Bearer ' + State.token, 'Content-Type': 'application/json' } };
     if (body) opts.body = JSON.stringify(body);
     return fetch(url, opts).then(function (r) {
       if (!r.ok) {
         return r.json().catch(function () { return { error: { message: r.statusText } }; })
-          .then(function (e) { throw new Error((e.error && e.error.message) || ('HTTP ' + r.status)); });
+          .then(function (e) { throw new Error((e.error && e.error.message) || 'HTTP ' + r.status); });
       }
       return r.json();
     });
   },
-
-  getRange: function (sheetId, range) {
-    return this.request('GET',
-      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId +
-      '/values/' + encodeURIComponent(range));
+  getRange: function (sid, range) {
+    return this.request('GET', 'https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(range));
   },
-
-  appendRows: function (sheetId, range, values) {
+  appendRows: function (sid, range, values) {
     return this.request('POST',
-      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId +
-      '/values/' + encodeURIComponent(range) +
-      ':append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
-      { values: values });
+      'https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(range) +
+      ':append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS', { values: values });
   },
-
-  updateRange: function (sheetId, range, values) {
+  updateRange: function (sid, range, values) {
     return this.request('PUT',
-      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId +
-      '/values/' + encodeURIComponent(range) +
-      '?valueInputOption=USER_ENTERED',
-      { values: values });
+      'https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(range) +
+      '?valueInputOption=USER_ENTERED', { values: values });
   },
-
-  batchUpdate: function (sheetId, requests) {
-    return this.request('POST',
-      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId + ':batchUpdate',
-      { requests: requests });
+  batchUpdate: function (sid, requests) {
+    return this.request('POST', 'https://sheets.googleapis.com/v4/spreadsheets/' + sid + ':batchUpdate', { requests: requests });
   },
-
-  getMeta: function (sheetId) {
-    return this.request('GET',
-      'https://sheets.googleapis.com/v4/spreadsheets/' + sheetId +
-      '?fields=sheets.properties');
+  getMeta: function (sid) {
+    return this.request('GET', 'https://sheets.googleapis.com/v4/spreadsheets/' + sid + '?fields=sheets.properties');
   },
-
-  uploadToDrive: function (folderId, fileName, blob, mimeType) {
-    this._checkToken();
+  uploadToDrive: function (folderId, fileName, blob) {
+    this._check();
     var meta = JSON.stringify({ name: fileName, parents: [folderId] });
     var form = new FormData();
     form.append('metadata', new Blob([meta], { type: 'application/json' }));
     form.append('file', blob, fileName);
-    return fetch(
-      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
-      { method: 'POST', headers: { 'Authorization': 'Bearer ' + State.token }, body: form }
-    ).then(function (r) {
-      if (!r.ok) throw new Error('Drive upload failed: ' + r.statusText);
-      return r.json();
-    });
+    return fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+      { method: 'POST', headers: { 'Authorization': 'Bearer ' + State.token }, body: form })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Drive upload failed: ' + r.statusText);
+        return r.json();
+      });
   }
 };
 
 // ─────────────────────────────────────────────────────────────
-// OAUTH  (implicit flow — popup then fallback redirect)
+// OAUTH
 // ─────────────────────────────────────────────────────────────
 var OAuth = {
   SCOPES: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive',
@@ -784,13 +694,9 @@ var OAuth = {
     var hash = window.location.hash;
     if (!hash || hash.indexOf('access_token') === -1) return false;
     var p = new URLSearchParams(hash.slice(1));
-    var token = p.get('access_token');
-    var exp   = parseInt(p.get('expires_in') || '3600', 10);
-    if (token) {
-      State.saveToken(token, exp);
-      window.history.replaceState(null, '', window.location.pathname);
-      return true;
-    }
+    var tok = p.get('access_token');
+    var exp = parseInt(p.get('expires_in') || '3600', 10);
+    if (tok) { State.saveToken(tok, exp); window.history.replaceState(null, '', window.location.pathname); return true; }
     return false;
   },
 
@@ -802,15 +708,10 @@ var OAuth = {
       return Promise.reject(new Error('no_client_id'));
     }
     var redirectUri = window.location.origin + window.location.pathname;
-    var params = new URLSearchParams({
-      client_id:              clientId,
-      redirect_uri:           redirectUri,
-      response_type:          'token',
-      scope:                  this.SCOPES,
-      include_granted_scopes: 'true',
-      prompt:                 'consent'
-    });
-    var url = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
+    var url = 'https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams({
+      client_id: clientId, redirect_uri: redirectUri, response_type: 'token',
+      scope: this.SCOPES, include_granted_scopes: 'true', prompt: 'consent'
+    }).toString();
 
     return new Promise(function (resolve, reject) {
       var popup = window.open(url, 'oauth_popup', 'width=520,height=620,scrollbars=yes');
@@ -822,58 +723,21 @@ var OAuth = {
       }
       var timer = setInterval(function () {
         try {
-          if (popup.closed) {
-            clearInterval(timer);
-            reject(new Error('popup_closed'));
-            return;
-          }
+          if (popup.closed) { clearInterval(timer); reject(new Error('popup_closed')); return; }
           var h = popup.location.hash;
           if (h && h.indexOf('access_token') !== -1) {
             clearInterval(timer);
-            var ps = new URLSearchParams(h.slice(1));
+            var ps  = new URLSearchParams(h.slice(1));
             var tok = ps.get('access_token');
             var exp = parseInt(ps.get('expires_in') || '3600', 10);
             popup.close();
             resolve({ token: tok, expiresIn: exp });
           }
-        } catch (e) { /* cross-origin during load — ignore */ }
+        } catch (e) { /* cross-origin during load */ }
       }, 300);
     });
   }
 };
-
-// ─────────────────────────────────────────────────────────────
-// UI HELPERS
-// ─────────────────────────────────────────────────────────────
-function signinCard(featureName) {
-  var hasId = !!State.get('clientId');
-  return '<div class="signin-card">' +
-    '<div class="sc-icon">&#128274;</div>' +
-    '<div class="sc-title">Sign in required</div>' +
-    '<div class="sc-sub">' +
-      (hasId
-        ? 'Sign in with Google to use ' + esc(featureName) + '.'
-        : 'Add your Google Client ID in Settings, then sign in.') +
-    '</div>' +
-    (hasId
-      ? '<button class="btn btn-primary" onclick="App.signIn()">' +
-          '<svg viewBox="0 0 24 24" width="18" height="18" style="stroke:none"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>' +
-          'Sign in with Google</button>'
-      : '<button class="btn btn-secondary" onclick="App.switchTab(\'settings\')">&#9881;&#65039; Go to Settings</button>') +
-    '</div>';
-}
-
-function esc(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function fmtR(n) {
-  return 'R' + Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-}
 
 // ─────────────────────────────────────────────────────────────
 // APP
@@ -888,7 +752,6 @@ var App = {
     App.updateAuthUI();
     Settings.populate();
     document.getElementById('proj-name').textContent = State.get('projName', 'ECM Solar Farm');
-
     if (State.isSignedIn) {
       var ret = sessionStorage.getItem('oauth_return') || 'labour';
       sessionStorage.removeItem('oauth_return');
@@ -907,18 +770,13 @@ var App = {
     var btn   = document.getElementById('s-auth-btn');
     var info  = document.getElementById('s-auth-info');
     var hasId = !!State.get('clientId');
-
     if (State.isSignedIn) {
-      dot.className = 'dot on';
-      label.textContent = 'Connected';
-      btn.textContent = 'Sign Out';
-      btn.onclick = function () { App.signOut(); };
+      dot.className = 'dot on'; label.textContent = 'Connected';
+      btn.textContent = 'Sign Out'; btn.onclick = function () { App.signOut(); };
       info.innerHTML = '<span class="badge badge-green">&#10003; Signed in to Google</span>';
     } else {
-      dot.className = 'dot';
-      label.textContent = 'Not signed in';
-      btn.textContent = 'Sign in with Google';
-      btn.onclick = function () { App.signIn(); };
+      dot.className = 'dot'; label.textContent = 'Not signed in';
+      btn.textContent = 'Sign in with Google'; btn.onclick = function () { App.signIn(); };
       info.innerHTML = hasId
         ? '<div class="text-muted">Not signed in</div>'
         : '<div class="text-muted" style="font-size:12px">Save your Client ID above, then tap Sign in.</div>';
@@ -927,32 +785,28 @@ var App = {
 
   signIn: function () {
     App.showLoading('Opening Google sign-in&#8230;');
-    OAuth.signIn().then(function (result) {
-      State.saveToken(result.token, result.expiresIn);
-      App.hideLoading();
-      App.updateAuthUI();
+    OAuth.signIn().then(function (r) {
+      State.saveToken(r.token, r.expiresIn);
+      App.hideLoading(); App.updateAuthUI();
       App.toast('Signed in successfully', 'success');
       App.switchTab('labour');
     }).catch(function (e) {
       App.hideLoading();
-      if (e.message !== 'popup_blocked' && e.message !== 'no_client_id' && e.message !== 'popup_closed') {
+      if (e.message !== 'popup_blocked' && e.message !== 'no_client_id' && e.message !== 'popup_closed')
         App.toast('Sign in failed: ' + e.message, 'error');
-      }
     });
   },
 
   signOut: function () {
     if (!confirm('Sign out of Google?')) return;
-    State.clearToken();
-    App.updateAuthUI();
+    State.clearToken(); App.updateAuthUI();
     App.toast('Signed out', 'info');
     App.switchTab('labour');
   },
 
-  // Tab bar is always functional — auth is handled inline within each screen.
   switchTab: function (tab) {
     App.currentTab = tab;
-    var tabs = ['labour', 'costs', 'dashboard', 'settings'];
+    var tabs = ['labour','costs','dashboard','settings'];
     for (var i = 0; i < tabs.length; i++) {
       var t = tabs[i];
       document.getElementById('tab-' + t).className = 'tab-btn' + (t === tab ? ' active' : '');
@@ -968,26 +822,17 @@ var App = {
     document.getElementById('loading-text').innerHTML = text || 'Loading&#8230;';
     document.getElementById('loading-overlay').style.display = 'flex';
   },
-
-  hideLoading: function () {
-    document.getElementById('loading-overlay').style.display = 'none';
-  },
+  hideLoading: function () { document.getElementById('loading-overlay').style.display = 'none'; },
 
   toast: function (msg, type) {
     var el = document.getElementById('toast');
-    el.innerHTML = msg;
-    el.className = 'toast ' + (type || 'info') + ' show';
+    el.innerHTML = msg; el.className = 'toast ' + (type || 'info') + ' show';
     clearTimeout(App._toastTimer);
     App._toastTimer = setTimeout(function () { el.className = 'toast'; }, 3200);
   },
 
-  openModal: function (id) {
-    document.getElementById(id).className = 'modal-back open';
-  },
-
-  closeModal: function (id) {
-    document.getElementById(id).className = 'modal-back';
-  }
+  openModal:  function (id) { document.getElementById(id).className = 'modal-back open'; },
+  closeModal: function (id) { document.getElementById(id).className = 'modal-back'; }
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -1019,58 +864,177 @@ var Settings = {
     App.toast('Settings saved &#10003;', 'success');
   },
 
-  signOut: function () {
-    App.signOut();
-  },
+  signOut: function () { App.signOut(); },
 
   initSheet: function () {
-    var sheetId = State.get('sheetId');
-    if (!sheetId)          { App.toast('Enter your Sheet ID first', 'error'); return; }
+    var sid = State.get('sheetId');
+    if (!sid)          { App.toast('Enter your Sheet ID first', 'error'); return; }
     if (!State.isSignedIn) { App.toast('Sign in to Google first', 'error'); return; }
-    if (!confirm('Create tabs and headers in your Google Sheet?')) return;
+    if (!confirm('Set up your Google Sheet? This will create tabs, remove Sheet1, and apply formatting.')) return;
+
+    var required = [
+      { name: 'Workers',   cols: 5,  headers: ['ID','Full Name','Daily Rate','Start Date','Active'] },
+      { name: 'Labour',    cols: 6,  headers: ['Date','Worker Name','Worker ID','Status','Daily Rate','Pay'] },
+      { name: 'Costs',     cols: 9,  headers: ['Date','Supplier','Invoice Number','Ex VAT','VAT (15%)','Total Inc VAT','Category','Notes','Drive File ID'] },
+      { name: 'Payments',  cols: 6,  headers: ['Date','Worker Name','Worker ID','Amount Paid','Payment Method','Notes'] },
+      { name: 'Dashboard', cols: 2,  headers: ['Metric','Value'] }
+    ];
+    var requiredNames = required.map(function (r) { return r.name; });
 
     App.showLoading('Setting up Google Sheet&#8230;');
-    GApi.getMeta(sheetId).then(function (meta) {
-      var existing = meta.sheets.map(function (s) { return s.properties.title; });
-      var required = [
-        { name: 'Workers',   headers: ['ID', 'Full Name', 'Daily Rate', 'Start Date', 'Active'] },
-        { name: 'Labour',    headers: ['Date', 'Worker Name', 'Worker ID', 'Status', 'Daily Rate', 'Pay'] },
-        { name: 'Costs',     headers: ['Date', 'Supplier', 'Invoice Number', 'Ex VAT', 'VAT (15%)', 'Total Inc VAT', 'Category', 'Notes', 'Drive File ID'] },
-        { name: 'Dashboard', headers: ['Metric', 'Value'] }
-      ];
-      var adds = [];
-      required.forEach(function (s) {
-        if (existing.indexOf(s.name) === -1) {
-          adds.push({ addSheet: { properties: { title: s.name } } });
-        }
+
+    // Step 1: get existing sheets
+    GApi.getMeta(sid).then(function (meta) {
+      var existing = meta.sheets;
+      var existingNames = existing.map(function (s) { return s.properties.title; });
+
+      var addReqs = [];
+      requiredNames.forEach(function (name) {
+        if (existingNames.indexOf(name) === -1)
+          addReqs.push({ addSheet: { properties: { title: name } } });
       });
-      var p = adds.length ? GApi.batchUpdate(sheetId, adds) : Promise.resolve();
-      return p.then(function () { return required; });
-    }).then(function (required) {
+
+      // Delete any sheet NOT in the required list (removes default Sheet1 etc.)
+      var delReqs = [];
+      existing.forEach(function (s) {
+        if (requiredNames.indexOf(s.properties.title) === -1)
+          delReqs.push({ deleteSheet: { sheetId: s.properties.sheetId } });
+      });
+
+      var reqs = addReqs.concat(delReqs);
+      return (reqs.length ? GApi.batchUpdate(sid, reqs) : Promise.resolve())
+        .then(function () { return required; });
+
+    // Step 2: write headers
+    }).then(function (req) {
       var chain = Promise.resolve();
-      required.forEach(function (s) {
+      req.forEach(function (s) {
         chain = chain.then(function () {
-          return GApi.updateRange(sheetId, s.name + '!A1', [s.headers]);
+          return GApi.updateRange(sid, s.name + '!A1', [s.headers]);
         });
       });
       return chain;
+
+    // Step 3: dashboard formulas
     }).then(function () {
-      return GApi.updateRange(sheetId, 'Dashboard!A2', [
+      return GApi.updateRange(sid, 'Dashboard!A2', [
         ['Total Labour Ex VAT',        '=SUM(Labour!F:F)'],
         ['Total Invoice Spend Ex VAT', '=SUM(Costs!D:D)'],
         ['Total Project Spend Ex VAT', '=SUM(Labour!F:F)+SUM(Costs!D:D)'],
-        ['Total VAT',                  '=SUM(Costs!E:E)'],
+        ['Total VAT (15%)',            '=SUM(Costs!E:E)'],
         ['Total Inc VAT',              '=SUM(Labour!F:F)+SUM(Costs!F:F)'],
+        ['Total Payments Made',        '=SUM(Payments!D:D)'],
         ['Working Days Logged',        '=COUNTA(UNIQUE(Labour!A2:A))'],
         ['Active Workers',             '=COUNTIF(Workers!E:E,"TRUE")']
       ]);
+
+    // Step 4: get fresh meta for sheet IDs then apply formatting
+    }).then(function () {
+      return GApi.getMeta(sid);
+    }).then(function (meta) {
+      var map = {};
+      meta.sheets.forEach(function (s) { map[s.properties.title] = s.properties.sheetId; });
+      var fmtReqs = Settings._buildFormatRequests(map);
+      return fmtReqs.length ? GApi.batchUpdate(sid, fmtReqs) : Promise.resolve();
+
     }).then(function () {
       App.hideLoading();
-      App.toast('Sheet initialised!', 'success');
+      App.toast('Sheet ready! &#10003;', 'success');
     }).catch(function (e) {
       App.hideLoading();
       App.toast('Error: ' + e.message, 'error');
     });
+  },
+
+  _buildFormatRequests: function (map) {
+    var reqs = [];
+
+    function freeze(sheetId) {
+      reqs.push({ updateSheetProperties: {
+        properties: { sheetId: sheetId, gridProperties: { frozenRowCount: 1 } },
+        fields: 'gridProperties.frozenRowCount'
+      }});
+    }
+
+    function boldHeader(sheetId, numCols) {
+      reqs.push({ repeatCell: {
+        range: { sheetId: sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: numCols },
+        cell: { userEnteredFormat: {
+          textFormat: { bold: true },
+          backgroundColor: { red: 0.18, green: 0.18, blue: 0.28 }
+        }},
+        fields: 'userEnteredFormat(textFormat,backgroundColor)'
+      }});
+    }
+
+    function dateFmt(sheetId, col) {
+      reqs.push({ repeatCell: {
+        range: { sheetId: sheetId, startRowIndex: 1, startColumnIndex: col, endColumnIndex: col + 1 },
+        cell: { userEnteredFormat: { numberFormat: { type: 'DATE', pattern: 'yyyy-mm-dd' } } },
+        fields: 'userEnteredFormat.numberFormat'
+      }});
+    }
+
+    function numFmt(sheetId, startCol, endCol) {
+      reqs.push({ repeatCell: {
+        range: { sheetId: sheetId, startRowIndex: 1, startColumnIndex: startCol, endColumnIndex: endCol },
+        cell: { userEnteredFormat: { numberFormat: { type: 'NUMBER', pattern: '#,##0.00' } } },
+        fields: 'userEnteredFormat.numberFormat'
+      }});
+    }
+
+    function colW(sheetId, startCol, endCol, px) {
+      reqs.push({ updateDimensionProperties: {
+        range: { sheetId: sheetId, dimension: 'COLUMNS', startIndex: startCol, endIndex: endCol },
+        properties: { pixelSize: px },
+        fields: 'pixelSize'
+      }});
+    }
+
+    // Workers
+    var wid = map['Workers'];
+    if (wid !== undefined) {
+      freeze(wid); boldHeader(wid, 5);
+      dateFmt(wid, 3); numFmt(wid, 2, 3);
+      colW(wid,0,1,100); colW(wid,1,2,180); colW(wid,2,3,110); colW(wid,3,4,120); colW(wid,4,5,80);
+    }
+
+    // Labour
+    var lid = map['Labour'];
+    if (lid !== undefined) {
+      freeze(lid); boldHeader(lid, 6);
+      dateFmt(lid, 0); numFmt(lid, 4, 6);
+      colW(lid,0,1,110); colW(lid,1,2,180); colW(lid,2,3,110);
+      colW(lid,3,4,90);  colW(lid,4,5,110); colW(lid,5,6,110);
+    }
+
+    // Costs
+    var cid = map['Costs'];
+    if (cid !== undefined) {
+      freeze(cid); boldHeader(cid, 9);
+      dateFmt(cid, 0); numFmt(cid, 3, 6);
+      colW(cid,0,1,110); colW(cid,1,2,180); colW(cid,2,3,130);
+      colW(cid,3,4,110); colW(cid,4,5,110); colW(cid,5,6,130);
+      colW(cid,6,7,140); colW(cid,7,8,200); colW(cid,8,9,150);
+    }
+
+    // Payments
+    var pid = map['Payments'];
+    if (pid !== undefined) {
+      freeze(pid); boldHeader(pid, 6);
+      dateFmt(pid, 0); numFmt(pid, 3, 4);
+      colW(pid,0,1,110); colW(pid,1,2,180); colW(pid,2,3,110);
+      colW(pid,3,4,120); colW(pid,4,5,130); colW(pid,5,6,200);
+    }
+
+    // Dashboard
+    var did = map['Dashboard'];
+    if (did !== undefined) {
+      freeze(did); boldHeader(did, 2);
+      colW(did,0,1,240); colW(did,1,2,140);
+    }
+
+    return reqs;
   }
 };
 
@@ -1081,7 +1045,7 @@ var Labour = {
   date:       null,
   workers:    [],
   attendance: {},
-  _sheetIdCache: {},
+  _tabIdCache: {},
 
   init: function () {
     if (!State.isSignedIn) {
@@ -1098,20 +1062,19 @@ var Labour = {
     Labour._loadWorkers();
   },
 
-  _isoDate: function (d) {
-    return d.toISOString().split('T')[0];
-  },
+  // Use local date components to avoid UTC-offset date shifting (SAST = UTC+2)
+  _isoDate: function (d) { return localIsoDate(d); },
 
   _renderDateNav: function () {
     var d     = Labour.date;
     var today = new Date(); today.setHours(0, 0, 0, 0);
-    var opts  = { weekday: 'long', day: 'numeric', month: 'long' };
-    document.getElementById('labour-date-main').textContent = d.toLocaleDateString('en-GB', opts);
+    document.getElementById('labour-date-main').textContent =
+      d.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long' });
     document.getElementById('labour-date-sub').textContent  =
-      d.getTime() === today.getTime() ? 'Today' : d.toLocaleDateString('en-GB');
+      d.getTime() === today.getTime() ? 'Today' : d.toLocaleDateString('en-ZA');
     var nb = document.getElementById('labour-next-btn');
-    nb.style.opacity  = d >= today ? '0.3' : '1';
-    nb.disabled       = d >= today;
+    nb.style.opacity = d >= today ? '0.3' : '1';
+    nb.disabled      = d >= today;
   },
 
   prevDay: function () {
@@ -1131,50 +1094,53 @@ var Labour = {
   },
 
   _loadWorkers: function () {
-    var sheetId = State.get('sheetId');
-    if (!sheetId) {
+    var sid = State.get('sheetId');
+    if (!sid) {
       document.getElementById('labour-list').innerHTML =
-        '<div class="empty-state"><div class="empty-icon">&#9881;</div>' +
-        '<div>Add your Sheet ID in Settings first</div></div>';
+        '<div class="empty-state"><div class="empty-icon">&#9881;</div><div>Add your Sheet ID in Settings first</div></div>';
       return;
     }
     App.showLoading('Loading workers&#8230;');
-    GApi.getRange(sheetId, 'Workers!A:E').then(function (res) {
+    GApi.getRange(sid, 'Workers!A:E').then(function (res) {
       var rows = (res.values || []).slice(1);
       Labour.workers = rows
         .filter(function (r) { return r[1] && r[4] !== 'FALSE'; })
         .map(function (r) {
-          return {
-            id:   r[0] || '',
-            name: r[1] || '',
-            rate: parseFloat(r[2]) || parseFloat(State.get('dailyRate', '1800'))
-          };
+          return { id: r[0] || '', name: r[1] || '',
+                   rate: parseFloat(r[2]) || parseFloat(State.get('dailyRate', '1800')) };
         });
       App.hideLoading();
       Labour._loadAttendance();
     }).catch(function (e) {
       App.hideLoading();
       document.getElementById('labour-list').innerHTML =
-        '<div class="empty-state"><div class="empty-icon">&#9888;</div>' +
-        '<div>Error: ' + esc(e.message) + '</div></div>';
+        '<div class="empty-state"><div class="empty-icon">&#9888;</div><div>Error: ' + esc(e.message) + '</div></div>';
     });
   },
 
   _loadAttendance: function () {
-    var sheetId = State.get('sheetId');
-    if (!sheetId) { Labour._renderWorkers(); return; }
+    var sid = State.get('sheetId');
+    if (!sid) { Labour._renderWorkers(); return; }
     var dateStr = Labour._isoDate(Labour.date);
-    GApi.getRange(sheetId, 'Labour!A:F').then(function (res) {
+
+    Promise.all([
+      GApi.getRange(sid, 'Labour!A:F'),
+      GApi.getRange(sid, 'Payments!A:F').catch(function () { return { values: [] }; })
+    ]).then(function (results) {
       Labour.attendance = {};
-      var rows = (res.values || []).slice(1);
-      rows.forEach(function (r) {
-        if (r[0] === dateStr) {
+      var labourRows  = (results[0].values || []).slice(1);
+      var paymentRows = (results[1].values || []).slice(1);
+
+      labourRows.forEach(function (r) {
+        // normalizeDate handles ZA locale "DD/MM/YYYY" returned by Sheets
+        if (normalizeDate(r[0]) === dateStr) {
           var key = r[2] || r[1];
           Labour.attendance[key] = r[3] === 'Present' ? 'present' : 'absent';
         }
       });
+
       Labour._renderWorkers();
-      Labour._loadTotals(rows);
+      Labour._loadTotals(labourRows, paymentRows);
     }).catch(function () {
       Labour._renderWorkers();
     });
@@ -1183,8 +1149,7 @@ var Labour = {
   _renderWorkers: function () {
     var list = document.getElementById('labour-list');
     if (Labour.workers.length === 0) {
-      list.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128119;</div>' +
-        '<div>No active workers. Add one below.</div></div>';
+      list.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128119;</div><div>No active workers. Add one below.</div></div>';
       document.getElementById('labour-save-btn').style.display = 'none';
       return;
     }
@@ -1193,34 +1158,32 @@ var Labour = {
       var key    = w.id || w.name;
       var ekey   = esc(key);
       var status = Labour.attendance[key] || '';
-      html += '<div class="worker-row" id="wr-' + btoa(unescape(encodeURIComponent(key))).replace(/[^a-zA-Z0-9]/g, '_') + '">' +
+      var safeKey = btoa(unescape(encodeURIComponent(key))).replace(/[^a-zA-Z0-9]/g, '_');
+      html += '<div class="worker-row" id="wr-' + safeKey + '">' +
         '<div class="worker-info">' +
           '<div class="worker-name">' + esc(w.name) + '</div>' +
-          '<div class="worker-meta">R' + w.rate.toLocaleString('en-ZA') + '/day Ex VAT</div>' +
+          '<div class="worker-meta">R' + w.rate.toLocaleString('en-ZA') + '/day</div>' +
         '</div>' +
         '<div class="att-wrap">' +
           '<button class="att-btn' + (status === 'present' ? ' present' : '') + '" ' +
-            'onclick="Labour.setAtt(\'' + ekey.replace(/'/g, "\\'") + '\',\'present\')">&#10003;</button>' +
+            'onclick="Labour.setAtt(\'' + ekey.replace(/'/g,"\\'") + '\',\'present\')">&#10003;</button>' +
           '<button class="att-btn' + (status === 'absent'  ? ' absent'  : '') + '" ' +
-            'onclick="Labour.setAtt(\'' + ekey.replace(/'/g, "\\'") + '\',\'absent\')">&#10007;</button>' +
-        '</div>' +
-      '</div>';
+            'onclick="Labour.setAtt(\'' + ekey.replace(/'/g,"\\'") + '\',\'absent\')">&#10007;</button>' +
+        '</div></div>';
     });
     list.innerHTML = html;
     document.getElementById('labour-save-btn').style.display = 'block';
   },
 
   setAtt: function (escapedKey, status) {
-    // Find real key from workers list
     var key = escapedKey;
     for (var i = 0; i < Labour.workers.length; i++) {
       var k = Labour.workers[i].id || Labour.workers[i].name;
       if (esc(k) === escapedKey) { key = k; break; }
     }
     Labour.attendance[key] = status;
-    // Update button states without full re-render
-    var rowId = 'wr-' + btoa(unescape(encodeURIComponent(key))).replace(/[^a-zA-Z0-9]/g, '_');
-    var row = document.getElementById(rowId);
+    var safeKey = btoa(unescape(encodeURIComponent(key))).replace(/[^a-zA-Z0-9]/g, '_');
+    var row = document.getElementById('wr-' + safeKey);
     if (row) {
       var btns = row.querySelectorAll('.att-btn');
       btns[0].className = 'att-btn' + (status === 'present' ? ' present' : '');
@@ -1229,40 +1192,37 @@ var Labour = {
   },
 
   save: function () {
-    var sheetId = State.get('sheetId');
-    if (!sheetId) { App.toast('No Sheet ID configured', 'error'); return; }
+    var sid = State.get('sheetId');
+    if (!sid) { App.toast('No Sheet ID configured', 'error'); return; }
     var dateStr = Labour._isoDate(Labour.date);
     var rows = [];
     Labour.workers.forEach(function (w) {
       var key    = w.id || w.name;
       var status = Labour.attendance[key];
       if (!status) return;
-      var label = status === 'present' ? 'Present' : 'Absent';
-      var pay   = status === 'present' ? w.rate : 0;
-      rows.push([dateStr, w.name, w.id || '', label, w.rate, pay]);
+      rows.push([dateStr, w.name, w.id || '', status === 'present' ? 'Present' : 'Absent',
+                 w.rate, status === 'present' ? w.rate : 0]);
     });
-    if (rows.length === 0) { App.toast('Mark at least one worker first', 'error'); return; }
+    if (!rows.length) { App.toast('Mark at least one worker first', 'error'); return; }
 
     App.showLoading('Saving attendance&#8230;');
-    // Clear existing rows for this date then append fresh
-    GApi.getRange(sheetId, 'Labour!A:F').then(function (res) {
-      var all    = res.values || [];
-      var idxs   = [];
+    GApi.getRange(sid, 'Labour!A:F').then(function (res) {
+      var all  = res.values || [];
+      var idxs = [];
       all.forEach(function (r, i) {
-        if (i > 0 && r[0] === dateStr) idxs.push(i);
+        // Use normalizeDate so comparison works even if Sheets returns "DD/MM/YYYY"
+        if (i > 0 && normalizeDate(r[0]) === dateStr) idxs.push(i);
       });
-      if (idxs.length === 0) return Promise.resolve();
-      return Labour._getTabSheetId(sheetId, 'Labour').then(function (tabId) {
+      if (!idxs.length) return Promise.resolve();
+      return Labour._getTabId(sid, 'Labour').then(function (tabId) {
         var reqs = idxs.map(function (i) {
-          return { updateCells: {
-            range: { sheetId: tabId, startRowIndex: i, endRowIndex: i + 1, startColumnIndex: 0, endColumnIndex: 6 },
-            fields: 'userEnteredValue'
-          }};
+          return { updateCells: { range: { sheetId: tabId, startRowIndex: i, endRowIndex: i + 1,
+            startColumnIndex: 0, endColumnIndex: 6 }, fields: 'userEnteredValue' } };
         });
-        return GApi.batchUpdate(sheetId, reqs);
+        return GApi.batchUpdate(sid, reqs);
       });
     }).then(function () {
-      return GApi.appendRows(sheetId, 'Labour!A:F', rows);
+      return GApi.appendRows(sid, 'Labour!A:F', rows);
     }).then(function () {
       App.hideLoading();
       var p = rows.filter(function (r) { return r[3] === 'Present'; }).length;
@@ -1274,40 +1234,90 @@ var Labour = {
     });
   },
 
-  _getTabSheetId: function (spreadsheetId, tabName) {
-    var cacheKey = spreadsheetId + ':' + tabName;
-    if (Labour._sheetIdCache[cacheKey] !== undefined) {
-      return Promise.resolve(Labour._sheetIdCache[cacheKey]);
-    }
+  _getTabId: function (spreadsheetId, tabName) {
+    var key = spreadsheetId + ':' + tabName;
+    if (Labour._tabIdCache[key] !== undefined) return Promise.resolve(Labour._tabIdCache[key]);
     return GApi.getMeta(spreadsheetId).then(function (meta) {
       meta.sheets.forEach(function (s) {
-        Labour._sheetIdCache[spreadsheetId + ':' + s.properties.title] = s.properties.sheetId;
+        Labour._tabIdCache[spreadsheetId + ':' + s.properties.title] = s.properties.sheetId;
       });
-      return Labour._sheetIdCache[cacheKey];
+      return Labour._tabIdCache[key];
     });
   },
 
-  _loadTotals: function (labourRows) {
-    var totals = {};
-    var days   = {};
+  // Build per-worker summary (earned / paid / balance) sorted by most recent day worked DESC
+  _loadTotals: function (labourRows, paymentRows) {
+    var earned  = {};
+    var days    = {};
+    var lastDay = {};
+    var wids    = {};
+
     labourRows.forEach(function (r) {
       if (!r[1] || r[3] !== 'Present') return;
-      var n = r[1];
-      totals[n] = (totals[n] || 0) + (parseFloat(r[5]) || 0);
+      var n   = r[1];
+      var d   = normalizeDate(r[0]);
+      var pay = parseFloat(r[5]) || 0;
+      earned[n] = (earned[n] || 0) + pay;
       days[n]   = (days[n]   || 0) + 1;
+      wids[n]   = r[2] || '';
+      if (!lastDay[n] || d > lastDay[n]) lastDay[n] = d;
     });
+
+    var paid = {};
+    (paymentRows || []).forEach(function (r) {
+      if (!r[1]) return;
+      paid[r[1]] = (paid[r[1]] || 0) + (parseFloat(r[3]) || 0);
+    });
+
     var card = document.getElementById('labour-totals-card');
-    var keys = Object.keys(totals);
-    if (keys.length === 0) { card.style.display = 'none'; return; }
+    var keys = Object.keys(earned);
+    if (!keys.length) { card.style.display = 'none'; return; }
     card.style.display = 'block';
-    keys.sort(function (a, b) { return totals[b] - totals[a]; });
+
+    // Sort by most recent day worked, descending
+    keys.sort(function (a, b) {
+      var da = lastDay[a] || '';
+      var db = lastDay[b] || '';
+      return db > da ? 1 : db < da ? -1 : 0;
+    });
+
     var html = '';
     keys.forEach(function (n) {
-      html += '<div class="sum-row">' +
-        '<div><div style="font-weight:600">' + esc(n) + '</div>' +
-        '<div class="text-muted">' + days[n] + ' day' + (days[n] !== 1 ? 's' : '') + '</div></div>' +
-        '<div style="font-weight:700;color:var(--accent)">R' + totals[n].toFixed(2) + '</div>' +
-      '</div>';
+      var e   = earned[n] || 0;
+      var p   = paid[n]   || 0;
+      var bal = e - p;
+      var wid = wids[n] || '';
+      var balColor = bal > 0.005 ? 'var(--red)' : 'var(--green)';
+      var safeN = n.replace(/'/g, "\\'");
+      var safeW = wid.replace(/'/g, "\\'");
+      html +=
+        '<div class="worker-summary-block">' +
+          '<div class="wsb-header">' +
+            '<div>' +
+              '<div style="font-weight:600;font-size:15px">' + esc(n) + '</div>' +
+              '<div class="text-muted">' + days[n] + ' day' + (days[n] !== 1 ? 's' : '') +
+                (lastDay[n] ? ' &middot; last ' + lastDay[n] : '') + '</div>' +
+            '</div>' +
+            '<button class="btn btn-sm btn-secondary" style="flex-shrink:0" ' +
+              'onclick="Payments.showModal(\'' + safeN + '\',\'' + safeW + '\',' + bal.toFixed(2) + ')">' +
+              '&#128178; Pay' +
+            '</button>' +
+          '</div>' +
+          '<div class="wsb-totals">' +
+            '<div class="wsb-cell">' +
+              '<div class="wsb-cell-lbl">Earned</div>' +
+              '<div class="wsb-cell-val" style="color:var(--accent)">R' + e.toFixed(2) + '</div>' +
+            '</div>' +
+            '<div class="wsb-cell">' +
+              '<div class="wsb-cell-lbl">Paid</div>' +
+              '<div class="wsb-cell-val" style="color:var(--green)">R' + p.toFixed(2) + '</div>' +
+            '</div>' +
+            '<div class="wsb-cell">' +
+              '<div class="wsb-cell-lbl">Owing</div>' +
+              '<div class="wsb-cell-val" style="color:' + balColor + '">R' + bal.toFixed(2) + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
     });
     document.getElementById('labour-totals').innerHTML = html;
   },
@@ -1325,17 +1335,57 @@ var Labour = {
     var rateIn = document.getElementById('nw-rate').value;
     var rate   = rateIn ? parseFloat(rateIn) : parseFloat(State.get('dailyRate', '1800'));
     if (!name) { App.toast('Enter worker name', 'error'); return; }
-    var sheetId = State.get('sheetId');
-    if (!sheetId) { App.toast('No Sheet ID configured', 'error'); return; }
-
+    var sid = State.get('sheetId');
+    if (!sid)  { App.toast('No Sheet ID configured', 'error'); return; }
     App.showLoading('Adding worker&#8230;');
-    var wid = 'W' + Date.now();
-    GApi.appendRows(sheetId, 'Workers!A:E', [[wid, name, rate, date, 'TRUE']])
+    GApi.appendRows(sid, 'Workers!A:E', [['W' + Date.now(), name, rate, date, 'TRUE']])
       .then(function () {
         App.closeModal('modal-add-worker');
         App.hideLoading();
         App.toast(name + ' added', 'success');
         Labour._loadWorkers();
+      }).catch(function (e) {
+        App.hideLoading();
+        App.toast('Error: ' + e.message, 'error');
+      });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────
+// PAYMENTS
+// ─────────────────────────────────────────────────────────────
+var Payments = {
+  _workerName: '',
+  _workerId:   '',
+
+  showModal: function (name, wid, balance) {
+    Payments._workerName = name;
+    Payments._workerId   = wid;
+    document.getElementById('pay-worker-display').textContent = name;
+    document.getElementById('pay-date').value   = Labour._isoDate(new Date());
+    document.getElementById('pay-amount').value = balance > 0.005 ? balance.toFixed(2) : '';
+    document.getElementById('pay-method').value = 'Cash';
+    document.getElementById('pay-notes').value  = '';
+    App.openModal('modal-pay-worker');
+  },
+
+  save: function () {
+    var sid    = State.get('sheetId');
+    if (!sid)  { App.toast('No Sheet ID configured', 'error'); return; }
+    var amount = parseFloat(document.getElementById('pay-amount').value) || 0;
+    var date   = document.getElementById('pay-date').value;
+    var method = document.getElementById('pay-method').value;
+    var notes  = document.getElementById('pay-notes').value.trim();
+    if (amount <= 0) { App.toast('Enter a payment amount', 'error'); return; }
+    if (!date)       { App.toast('Enter a date', 'error'); return; }
+    App.showLoading('Recording payment&#8230;');
+    GApi.appendRows(sid, 'Payments!A:F',
+      [[date, Payments._workerName, Payments._workerId, amount, method, notes]])
+      .then(function () {
+        App.closeModal('modal-pay-worker');
+        App.hideLoading();
+        App.toast('Payment of R' + amount.toFixed(2) + ' recorded', 'success');
+        Labour._loadAttendance();  // refresh totals
       }).catch(function (e) {
         App.hideLoading();
         App.toast('Error: ' + e.message, 'error');
@@ -1366,27 +1416,20 @@ var Costs = {
     }
   },
 
-  triggerUpload: function () {
-    document.getElementById('inv-file').click();
-  },
+  triggerUpload: function () { document.getElementById('inv-file').click(); },
 
   handleFile: function (e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    Costs.file = file;
-    e.target.value = '';
-
+    var file = e.target.files[0]; if (!file) return;
+    Costs.file = file; e.target.value = '';
     var preview = document.getElementById('inv-preview');
     document.getElementById('costs-extract').style.display = 'block';
     document.getElementById('extract-form').style.display  = 'none';
-
     if (file.type.indexOf('image') === 0) {
       preview.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Invoice">';
-      preview.style.display = 'block';
     } else {
       preview.innerHTML = '<div style="padding:10px;color:var(--muted)">&#128196; ' + esc(file.name) + '</div>';
-      preview.style.display = 'block';
     }
+    preview.style.display = 'block';
     Costs._extract(file);
   },
 
@@ -1401,36 +1444,27 @@ var Costs = {
 
   _extract: function (file) {
     var apiKey = State.get('anthropicKey');
-    if (!apiKey) {
-      App.toast('Add Anthropic API key in Settings for auto-extraction', 'info');
-      Costs._showForm({});
-      return;
-    }
+    if (!apiKey) { App.toast('Add Anthropic API key in Settings for auto-extraction', 'info'); Costs._showForm({}); return; }
     document.getElementById('extract-loading').style.display = 'block';
-
     Costs._fileToB64(file).then(function (b64) {
-      var isPdf   = file.type === 'application/pdf';
+      var isPdf = file.type === 'application/pdf';
       var content = [
-        isPdf
-          ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } }
-          : { type: 'image',    source: { type: 'base64', media_type: file.type,           data: b64 } },
+        isPdf ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } }
+              : { type: 'image',    source: { type: 'base64', media_type: file.type, data: b64 } },
         { type: 'text', text:
           'Extract invoice data and return ONLY valid JSON, no markdown. Keys: ' +
-          'supplier (string), invoiceNumber (string), date (YYYY-MM-DD string), ' +
+          'supplier (string), invoiceNumber (string), date (YYYY-MM-DD), ' +
           'lineItems ([{description, amount}] where amount is Ex VAT), ' +
-          'exVat (number, amount excluding VAT), vat (number, VAT amount at 15%), ' +
-          'totalIncVat (number, total including VAT). ' +
-          'If exVat is missing but totalIncVat is present, derive exVat = totalIncVat / 1.15. ' +
-          'Use null for fields that cannot be determined.' }
+          'exVat (number excluding VAT), vat (number, 15% VAT amount), ' +
+          'totalIncVat (number including VAT). ' +
+          'If exVat missing but totalIncVat present, derive exVat = totalIncVat / 1.15. ' +
+          'Use null for undetermined fields.' }
       ];
       return fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-client-side-api-key-access': 'true'
-        },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey,
+                   'anthropic-version': '2023-06-01',
+                   'anthropic-dangerous-client-side-api-key-access': 'true' },
         body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1024,
           messages: [{ role: 'user', content: content }] })
       });
@@ -1441,10 +1475,7 @@ var Costs = {
       var text = result.content[0].text.trim();
       var data;
       try { data = JSON.parse(text); }
-      catch (_) {
-        var m = text.match(/\{[\s\S]*\}/);
-        data = m ? JSON.parse(m[0]) : {};
-      }
+      catch (_) { var m = text.match(/\{[\s\S]*\}/); data = m ? JSON.parse(m[0]) : {}; }
       document.getElementById('extract-loading').style.display = 'none';
       Costs._showForm(data);
     }).catch(function (e) {
@@ -1457,48 +1488,50 @@ var Costs = {
   _showForm: function (d) {
     document.getElementById('inv-supplier').value = d.supplier      || '';
     document.getElementById('inv-number').value   = d.invoiceNumber || '';
-    document.getElementById('inv-date').value     = d.date          || new Date().toISOString().split('T')[0];
+    // Use local SAST date for default, not UTC
+    document.getElementById('inv-date').value     = d.date || Labour._isoDate(new Date());
     document.getElementById('inv-notes').value    = '';
-
-    // Populate Ex VAT, VAT, Total Inc VAT — derive any missing value
     var exVat = parseFloat(d.exVat) || 0;
     var vat   = parseFloat(d.vat)   || 0;
     var total = parseFloat(d.totalIncVat) || 0;
-    // If exVat provided but vat missing, calculate vat
-    if (exVat && !vat) { vat   = Math.round(exVat * 0.15 * 100) / 100; }
-    // If vat provided but exVat missing, back-calculate
-    if (vat && !exVat) { exVat = Math.round((vat / 0.15) * 100) / 100; }
-    // Recalculate total from exVat + vat
-    if (exVat || vat)  { total = Math.round((exVat + vat) * 100) / 100; }
-
+    if (exVat && !vat)  { vat   = Math.round(exVat * 0.15 * 100) / 100; }
+    if (vat  && !exVat) { exVat = Math.round((vat / 0.15) * 100) / 100; }
+    if (exVat || vat)   { total = Math.round((exVat + vat) * 100) / 100; }
     document.getElementById('inv-exvat').value = exVat || '';
     document.getElementById('inv-vat').value   = vat   || '';
     document.getElementById('inv-total').value = total || '';
-
-    var liSec  = document.getElementById('inv-lineitems');
-    var liBody = document.getElementById('inv-li-body');
+    var liSec = document.getElementById('inv-lineitems');
     if (d.lineItems && d.lineItems.length) {
       liSec.style.display = 'block';
       var html = '<table class="li-table"><thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead><tbody>';
       d.lineItems.forEach(function (item) {
-        html += '<tr><td>' + esc(item.description || '') + '</td>' +
-          '<td style="text-align:right">R' + (item.amount || 0).toFixed(2) + '</td></tr>';
+        html += '<tr><td>' + esc(item.description || '') + '</td><td style="text-align:right">R' + (item.amount || 0).toFixed(2) + '</td></tr>';
       });
-      liBody.innerHTML = html + '</tbody></table>';
+      document.getElementById('inv-li-body').innerHTML = html + '</tbody></table>';
     } else {
       liSec.style.display = 'none';
     }
     document.getElementById('extract-form').style.display = 'block';
   },
 
-  confirmSave: function () {
-    var sheetId  = State.get('sheetId');
-    var folderId = State.get('folderId');
-    if (!sheetId) { App.toast('No Sheet ID configured', 'error'); return; }
+  calcVat: function () {
+    var x = parseFloat(document.getElementById('inv-exvat').value) || 0;
+    var v = Math.round(x * 0.15 * 100) / 100;
+    document.getElementById('inv-vat').value   = x ? v.toFixed(2)           : '';
+    document.getElementById('inv-total').value = x ? (x + v).toFixed(2)     : '';
+  },
 
+  calcTotal: function () {
+    var x = parseFloat(document.getElementById('inv-exvat').value) || 0;
+    var v = parseFloat(document.getElementById('inv-vat').value)   || 0;
+    document.getElementById('inv-total').value = (x + v).toFixed(2);
+  },
+
+  confirmSave: function () {
+    var sid = State.get('sheetId');
+    if (!sid) { App.toast('No Sheet ID configured', 'error'); return; }
     var supplier = document.getElementById('inv-supplier').value.trim();
     if (!supplier) { App.toast('Enter supplier name', 'error'); return; }
-
     var invNum  = document.getElementById('inv-number').value.trim();
     var invDate = document.getElementById('inv-date').value;
     var exVat   = parseFloat(document.getElementById('inv-exvat').value) || 0;
@@ -1506,90 +1539,59 @@ var Costs = {
     var total   = parseFloat(document.getElementById('inv-total').value) || 0;
     var cat     = document.getElementById('inv-cat').value;
     var notes   = document.getElementById('inv-notes').value.trim();
-    // Ensure totals are consistent before saving
-    if (exVat && !vat)   { vat   = Math.round(exVat * 0.15 * 100) / 100; }
-    if (exVat || vat)    { total = Math.round((exVat + vat) * 100) / 100; }
-
+    if (exVat && !vat)  { vat   = Math.round(exVat * 0.15 * 100) / 100; }
+    if (exVat || vat)   { total = Math.round((exVat + vat) * 100) / 100; }
     App.showLoading('Saving invoice&#8230;');
-
-    var drivePromise = (folderId && Costs.file)
+    var folderId = State.get('folderId');
+    var driveP = (folderId && Costs.file)
       ? (function () {
-          var ts   = new Date().toISOString().replace(/[:.]/g, '-');
-          var ext  = (Costs.file.name.split('.').pop() || 'jpg');
-          var name = 'INV_' + supplier.replace(/[^a-zA-Z0-9]/g, '_') + '_' + ts + '.' + ext;
-          return GApi.uploadToDrive(folderId, name, Costs.file, Costs.file.type)
+          var ts   = new Date().toISOString().replace(/[:.]/g,'-');
+          var ext  = Costs.file.name.split('.').pop() || 'jpg';
+          var name = 'INV_' + supplier.replace(/[^a-zA-Z0-9]/g,'_') + '_' + ts + '.' + ext;
+          return GApi.uploadToDrive(folderId, name, Costs.file)
             .then(function (r) { return r.id || ''; })
-            .catch(function (e) {
-              App.toast('Drive upload failed — data still saved: ' + e.message, 'error');
-              return '';
-            });
+            .catch(function (e) { App.toast('Drive upload failed (data still saved): ' + e.message, 'error'); return ''; });
         })()
       : Promise.resolve('');
-
-    drivePromise.then(function (driveId) {
-      return GApi.appendRows(sheetId, 'Costs!A:I',
-        [[invDate, supplier, invNum, exVat, vat, total, cat, notes, driveId]]);
+    driveP.then(function (driveId) {
+      return GApi.appendRows(sid, 'Costs!A:I', [[invDate, supplier, invNum, exVat, vat, total, cat, notes, driveId]]);
     }).then(function () {
-      App.hideLoading();
-      App.toast('Invoice saved!', 'success');
-      Costs.reset();
+      App.hideLoading(); App.toast('Invoice saved!', 'success'); Costs.reset();
     }).catch(function (e) {
-      App.hideLoading();
-      App.toast('Error: ' + e.message, 'error');
+      App.hideLoading(); App.toast('Error: ' + e.message, 'error');
     });
   },
 
   reset: function () {
     Costs.file = null;
-    document.getElementById('costs-extract').style.display   = 'none';
-    document.getElementById('inv-preview').style.display     = 'none';
-    document.getElementById('extract-loading').style.display = 'none';
-    document.getElementById('extract-form').style.display    = 'none';
+    ['costs-extract','inv-preview','extract-loading','extract-form'].forEach(function (id) {
+      document.getElementById(id).style.display = 'none';
+    });
     ['inv-exvat','inv-vat','inv-total'].forEach(function (id) {
       document.getElementById(id).value = '';
     });
-  },
-
-  // Auto-calculate VAT (15%) and Total from Ex VAT field
-  calcVat: function () {
-    var exVat = parseFloat(document.getElementById('inv-exvat').value) || 0;
-    var vat   = Math.round(exVat * 0.15 * 100) / 100;
-    document.getElementById('inv-vat').value   = exVat ? vat.toFixed(2)              : '';
-    document.getElementById('inv-total').value = exVat ? (exVat + vat).toFixed(2)    : '';
-  },
-
-  // Recalculate Total when VAT is manually edited
-  calcTotal: function () {
-    var exVat = parseFloat(document.getElementById('inv-exvat').value) || 0;
-    var vat   = parseFloat(document.getElementById('inv-vat').value)   || 0;
-    document.getElementById('inv-total').value = (exVat + vat).toFixed(2);
   },
 
   showHistory: function () {
     App.openModal('modal-history');
     var el = document.getElementById('history-list');
     el.innerHTML = '<div class="text-muted">Loading&#8230;</div>';
-    var sheetId = State.get('sheetId');
-    if (!sheetId) { el.innerHTML = '<div class="text-muted">No Sheet ID configured</div>'; return; }
-
-    GApi.getRange(sheetId, 'Costs!A:I').then(function (res) {
+    var sid = State.get('sheetId');
+    if (!sid) { el.innerHTML = '<div class="text-muted">No Sheet ID configured</div>'; return; }
+    GApi.getRange(sid, 'Costs!A:I').then(function (res) {
       var rows = (res.values || []).slice(1).reverse().slice(0, 20);
       if (!rows.length) { el.innerHTML = '<div class="text-muted">No invoices yet</div>'; return; }
       var html = '';
       rows.forEach(function (r) {
-        // Cols: Date(0) Supplier(1) InvNum(2) ExVAT(3) VAT(4) TotalIncVAT(5) Category(6) Notes(7)
         html += '<div class="sum-row">' +
-          '<div><div style="font-weight:600">' + esc(r[1] || '—') + '</div>' +
+          '<div><div style="font-weight:600">' + esc(r[1] || '&#8212;') + '</div>' +
           '<div class="text-muted">' + esc(r[0] || '') + ' &middot; ' + esc(r[6] || '') + '</div></div>' +
           '<div style="text-align:right">' +
           '<div style="font-weight:700;color:var(--accent)">R' + parseFloat(r[3] || 0).toFixed(2) + ' Ex VAT</div>' +
-          '<div class="text-muted" style="font-size:11px">' + esc(r[2] || '') + '</div>' +
-          '</div></div>';
+          '<div class="text-muted" style="font-size:11px">' + esc(r[2] || '') + '</div></div></div>';
       });
       el.innerHTML = html;
-    }).catch(function (e) {
-      el.innerHTML = '<div class="text-muted">Error: ' + esc(e.message) + '</div>';
-    });
+    }).catch(function (e) { el.innerHTML = '<div class="text-muted">Error: ' + esc(e.message) + '</div>'; });
   }
 };
 
@@ -1599,79 +1601,82 @@ var Costs = {
 var Dashboard = {
   load: function () {
     if (!State.isSignedIn) {
-      document.getElementById('dash-updated').textContent = '— not signed in';
+      document.getElementById('dash-updated').textContent = '&#8212; not signed in';
       ['ds-spend','ds-labour','ds-days','ds-workers','ds-vat','ds-incvat'].forEach(function (id) {
-        document.getElementById(id).textContent = '—';
+        document.getElementById(id).textContent = '&#8212;';
       });
       document.getElementById('ds-budget-card').style.display = 'none';
       document.getElementById('ds-cats').innerHTML     = signinCard('Dashboard');
       document.getElementById('ds-wsummary').innerHTML = '';
       return;
     }
-    var sheetId = State.get('sheetId');
-    if (!sheetId) { App.toast('Add Sheet ID in Settings', 'error'); return; }
-
+    var sid = State.get('sheetId');
+    if (!sid) { App.toast('Add Sheet ID in Settings', 'error'); return; }
     App.showLoading('Loading dashboard&#8230;');
     document.getElementById('dash-updated').textContent = 'Refreshing&#8230;';
 
     Promise.all([
-      GApi.getRange(sheetId, 'Labour!A:F'),
-      GApi.getRange(sheetId, 'Costs!A:H'),
-      GApi.getRange(sheetId, 'Workers!A:E')
+      GApi.getRange(sid, 'Labour!A:F'),
+      GApi.getRange(sid, 'Costs!A:I'),
+      GApi.getRange(sid, 'Workers!A:E'),
+      GApi.getRange(sid, 'Payments!A:D').catch(function () { return { values: [] }; })
     ]).then(function (results) {
       var labourRows  = (results[0].values || []).slice(1);
       var costsRows   = (results[1].values || []).slice(1);
       var workerRows  = (results[2].values || []).slice(1);
+      var payRows     = (results[3].values || []).slice(1);
 
       var totalLabour = 0;
       var uniqueDays  = {};
-      var wTotals     = {};
+      var wEarned     = {};
       var wDays       = {};
       labourRows.forEach(function (r) {
         if (r[3] !== 'Present') return;
         var pay = parseFloat(r[5]) || 0;
         totalLabour += pay;
-        uniqueDays[r[0]] = 1;
+        uniqueDays[normalizeDate(r[0])] = 1;
         var n = r[1];
-        wTotals[n] = (wTotals[n] || 0) + pay;
+        wEarned[n] = (wEarned[n] || 0) + pay;
         wDays[n]   = (wDays[n]   || 0) + 1;
       });
 
-      // Costs: col D (idx 3) = Ex VAT, col E (idx 4) = VAT, col F (idx 5) = Total Inc VAT
-      // Category is now col G (idx 6)
       var totalCostsExVat = 0;
       var totalVat        = 0;
       var catTotals       = {};
       costsRows.forEach(function (r) {
         var exv = parseFloat(r[3]) || 0;
         var v   = parseFloat(r[4]) || 0;
-        totalCostsExVat += exv;
-        totalVat        += v;
+        totalCostsExVat += exv; totalVat += v;
         var cat = r[6] || 'Other';
         catTotals[cat] = (catTotals[cat] || 0) + exv;
       });
 
-      var totalSpendExVat = totalLabour + totalCostsExVat;
-      var totalIncVat     = totalSpendExVat + totalVat;
-      var activeWorkers   = workerRows.filter(function (r) { return r[4] !== 'FALSE'; }).length;
-      var daysCount       = Object.keys(uniqueDays).length;
+      var wPaid = {};
+      payRows.forEach(function (r) {
+        if (!r[1]) return;
+        wPaid[r[1]] = (wPaid[r[1]] || 0) + (parseFloat(r[3]) || 0);
+      });
 
-      document.getElementById('ds-spend').innerHTML   = fmtR(totalSpendExVat);
-      document.getElementById('ds-labour').innerHTML  = fmtR(totalLabour);
-      document.getElementById('ds-days').textContent  = daysCount;
+      var totalSpend    = totalLabour + totalCostsExVat;
+      var totalIncVat   = totalSpend + totalVat;
+      var activeWorkers = workerRows.filter(function (r) { return r[4] !== 'FALSE'; }).length;
+      var daysCount     = Object.keys(uniqueDays).length;
+
+      document.getElementById('ds-spend').innerHTML    = fmtR(totalSpend);
+      document.getElementById('ds-labour').innerHTML   = fmtR(totalLabour);
+      document.getElementById('ds-days').textContent   = daysCount;
       document.getElementById('ds-workers').textContent = activeWorkers;
-      document.getElementById('ds-vat').innerHTML     = fmtR(totalVat);
-      document.getElementById('ds-incvat').innerHTML  = fmtR(totalIncVat);
+      document.getElementById('ds-vat').innerHTML      = fmtR(totalVat);
+      document.getElementById('ds-incvat').innerHTML   = fmtR(totalIncVat);
 
-      // Budget vs spend — Ex VAT only
       var budget     = parseFloat(State.get('budget', '4500000'));
       var budgetCard = document.getElementById('ds-budget-card');
       if (budget > 0) {
         budgetCard.style.display = 'block';
-        var pct = Math.min((totalSpendExVat / budget) * 100, 100);
-        document.getElementById('ds-bspent').innerHTML = fmtR(totalSpendExVat);
+        var pct = Math.min((totalSpend / budget) * 100, 100);
+        document.getElementById('ds-bspent').innerHTML = fmtR(totalSpend);
         document.getElementById('ds-btotal').innerHTML = fmtR(budget);
-        document.getElementById('ds-brem').innerHTML   = fmtR(Math.max(budget - totalSpendExVat, 0)) + ' Ex VAT remaining';
+        document.getElementById('ds-brem').innerHTML   = fmtR(Math.max(budget - totalSpend, 0)) + ' Ex VAT remaining';
         var bar = document.getElementById('ds-bbar');
         bar.style.width = pct + '%';
         bar.className   = 'bbar-fill' + (pct > 90 ? ' danger' : pct > 70 ? ' warn' : '');
@@ -1681,42 +1686,45 @@ var Dashboard = {
 
       // Categories
       var catKeys = Object.keys(catTotals);
-      if (catKeys.length === 0) {
+      if (!catKeys.length) {
         document.getElementById('ds-cats').innerHTML = '<div class="text-muted">No cost data yet</div>';
       } else {
         catKeys.sort(function (a, b) { return catTotals[b] - catTotals[a]; });
         var maxC = catTotals[catKeys[0]] || 1;
         var html = '';
         catKeys.forEach(function (c) {
-          html += '<div class="cat-row">' +
-            '<div class="cat-name">' + esc(c) + '</div>' +
+          html += '<div class="cat-row"><div class="cat-name">' + esc(c) + '</div>' +
             '<div class="cat-bar"><div class="cat-bar-fill" style="width:' +
-              ((catTotals[c] / maxC) * 100).toFixed(1) + '%"></div></div>' +
-            '<div class="cat-amt">' + fmtR(catTotals[c]) + '</div>' +
-          '</div>';
+            ((catTotals[c] / maxC) * 100).toFixed(1) + '%"></div></div>' +
+            '<div class="cat-amt">' + fmtR(catTotals[c]) + '</div></div>';
         });
         document.getElementById('ds-cats').innerHTML = html;
       }
 
-      // Workers
-      var wKeys = Object.keys(wTotals);
-      if (wKeys.length === 0) {
+      // Worker summary with balance
+      var wKeys = Object.keys(wEarned);
+      if (!wKeys.length) {
         document.getElementById('ds-wsummary').innerHTML = '<div class="text-muted">No labour data yet</div>';
       } else {
-        wKeys.sort(function (a, b) { return wTotals[b] - wTotals[a]; });
+        wKeys.sort(function (a, b) { return wEarned[b] - wEarned[a]; });
         var whtml = '';
         wKeys.forEach(function (n) {
+          var e   = wEarned[n] || 0;
+          var p   = wPaid[n]  || 0;
+          var bal = e - p;
           whtml += '<div class="sum-row">' +
             '<div><div style="font-weight:600">' + esc(n) + '</div>' +
             '<div class="text-muted">' + wDays[n] + ' day' + (wDays[n] !== 1 ? 's' : '') + '</div></div>' +
-            '<div style="font-weight:700;color:var(--accent)">R' + wTotals[n].toFixed(2) + '</div>' +
-          '</div>';
+            '<div style="text-align:right">' +
+            '<div style="font-weight:700;color:var(--accent)">R' + e.toFixed(2) + '</div>' +
+            '<div class="text-muted" style="font-size:11px">Owing: R' + bal.toFixed(2) + '</div>' +
+            '</div></div>';
         });
         document.getElementById('ds-wsummary').innerHTML = whtml;
       }
 
       document.getElementById('dash-updated').textContent =
-        'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        'Updated ' + new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
       App.hideLoading();
     }).catch(function (e) {
       App.hideLoading();
@@ -1727,11 +1735,12 @@ var Dashboard = {
 
 // ─────────────────────────────────────────────────────────────
 // EXPOSE TO GLOBAL SCOPE
-// (const/let at script scope are NOT on window in Safari/WebKit;
-//  inline onclick handlers need these on window)
+// const/let at script scope are NOT on window in Safari/WebKit.
+// Inline onclick handlers require these on window.
 // ─────────────────────────────────────────────────────────────
 window.App       = App;
 window.Labour    = Labour;
+window.Payments  = Payments;
 window.Costs     = Costs;
 window.Dashboard = Dashboard;
 window.Settings  = Settings;
