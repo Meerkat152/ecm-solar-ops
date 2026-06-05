@@ -93,21 +93,23 @@
   .screen { display: none; padding: 16px; padding-bottom: 24px; }
   .screen.active { display: block; }
 
-  /* ── Auth Screen ── */
-  #screen-auth {
+  /* ── Sign-in card (inline, inside each screen) ── */
+  .signin-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 70vh;
-    gap: 24px;
+    gap: 16px;
     text-align: center;
-    padding: 24px;
+    padding: 40px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-top: 12px;
   }
 
-  .auth-logo { font-size: 56px; }
-  .auth-title { font-size: 26px; font-weight: 800; color: var(--accent); }
-  .auth-sub { font-size: 14px; color: var(--text-muted); max-width: 300px; line-height: 1.5; }
+  .signin-card .auth-logo { font-size: 44px; }
+  .signin-card .auth-title { font-size: 18px; font-weight: 700; color: var(--text); }
+  .signin-card .auth-sub { font-size: 13px; color: var(--text-muted); max-width: 280px; line-height: 1.5; }
 
   /* ── Cards ── */
   .card {
@@ -388,21 +390,6 @@
   </div>
 
   <div id="content">
-    <!-- Auth Screen (shown when not signed in and clientId is set) -->
-    <div id="screen-auth">
-      <div class="auth-logo">⚡</div>
-      <div class="auth-title">Solar Ops</div>
-      <div class="auth-sub" id="auth-screen-sub">Sign in with Google to continue.</div>
-      <button class="btn btn-primary" id="auth-signin-btn" onclick="App.signIn()" style="max-width:300px;display:none">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
-        Sign in with Google
-      </button>
-      <button class="btn btn-secondary" id="auth-setup-btn" onclick="App.switchTab('settings')" style="max-width:300px;display:none">
-        ⚙️ Open Settings to configure
-      </button>
-      <p class="text-muted" style="font-size:12px" id="auth-screen-hint"></p>
-    </div>
-
     <!-- Labour Screen -->
     <div id="screen-labour" class="screen">
       <div class="date-nav">
@@ -961,15 +948,14 @@ const App = {
   async init() {
     State.load();
 
-    // Handle OAuth redirect
+    // Handle OAuth redirect (implicit flow returns here with token in hash)
     const wasRedirect = OAuth.handleRedirectToken();
 
     this.updateAuthUI();
     this.populateSettings();
 
-    // Update project name display
-    const projectName = State.get('projectName', 'ECM Solar Farm');
-    document.getElementById('project-name-display').textContent = projectName;
+    document.getElementById('project-name-display').textContent =
+      State.get('projectName', 'ECM Solar Farm');
 
     if (State.isSignedIn) {
       const returnTab = sessionStorage.getItem('oauth_return_tab') || 'labour';
@@ -977,12 +963,11 @@ const App = {
       this.switchTab(returnTab);
       if (wasRedirect) App.showToast('Signed in successfully', 'success');
     } else if (!State.get('clientId')) {
-      // No client ID configured yet — go straight to Settings so user can configure
+      // First run — no Client ID yet. Open Settings so user can configure.
       this.switchTab('settings');
-      App.showToast('Welcome! Enter your Google Client ID to get started.', 'info');
     } else {
-      // Client ID exists but not signed in — show sign-in screen
-      document.getElementById('screen-auth').style.display = 'flex';
+      // Client ID set but not signed in — open Labour tab (will show sign-in card).
+      this.switchTab('labour');
     }
   },
 
@@ -993,46 +978,20 @@ const App = {
     const settingsInfo = document.getElementById('settings-auth-info');
     const hasClientId = !!State.get('clientId');
 
-    // Header status dot
     if (State.isSignedIn) {
       dot.className = 'dot connected';
       label.textContent = 'Connected';
-    } else {
-      dot.className = 'dot';
-      label.textContent = 'Not signed in';
-    }
-
-    // Settings screen auth section
-    if (State.isSignedIn) {
       settingsBtn.textContent = 'Sign Out';
       settingsBtn.onclick = () => App.signOut();
       settingsInfo.innerHTML = '<span class="badge badge-green">✓ Signed in to Google</span>';
-    } else if (hasClientId) {
+    } else {
+      dot.className = 'dot';
+      label.textContent = 'Not signed in';
       settingsBtn.textContent = 'Sign in with Google';
       settingsBtn.onclick = () => App.signIn();
-      settingsInfo.innerHTML = '<div class="text-muted">Not signed in</div>';
-    } else {
-      settingsBtn.textContent = 'Sign in with Google';
-      settingsBtn.onclick = () => App.signIn();
-      settingsInfo.innerHTML = '<div class="text-muted" style="font-size:12px">Enter your Google Client ID above, then save settings before signing in.</div>';
-    }
-
-    // Auth screen (sign-in wall) — only shown when clientId is set but not signed in
-    const authSigninBtn = document.getElementById('auth-signin-btn');
-    const authSetupBtn = document.getElementById('auth-setup-btn');
-    const authSub = document.getElementById('auth-screen-sub');
-    const authHint = document.getElementById('auth-screen-hint');
-
-    if (hasClientId) {
-      authSigninBtn.style.display = '';
-      authSetupBtn.style.display = 'none';
-      authSub.textContent = 'Sign in with Google to access the app.';
-      authHint.textContent = "You'll be asked to grant access to Google Sheets and Drive.";
-    } else {
-      authSigninBtn.style.display = 'none';
-      authSetupBtn.style.display = '';
-      authSub.textContent = 'Configure your Google Client ID in Settings to get started.';
-      authHint.textContent = '';
+      settingsInfo.innerHTML = hasClientId
+        ? '<div class="text-muted">Not signed in</div>'
+        : '<div class="text-muted" style="font-size:12px">Enter your Client ID above and tap Save, then sign in.</div>';
     }
   },
 
@@ -1043,7 +1002,6 @@ const App = {
       State.saveToken(token, expiresIn);
       App.hideLoading();
       App.updateAuthUI();
-      document.getElementById('screen-auth').style.display = 'none';
       App.showToast('Signed in successfully', 'success');
       App.switchTab('labour');
     } catch(e) {
@@ -1062,19 +1020,13 @@ const App = {
   handleSignOut() {
     State.clearToken();
     this.updateAuthUI();
-    document.getElementById('screen-auth').style.display = 'flex';
-    // Hide all screens
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     App.showToast('Signed out', 'info');
+    // Re-render current tab so it shows the sign-in card
+    App.switchTab(this.currentTab === 'settings' ? 'settings' : 'labour');
   },
 
+  // Tab navigation is always unconditional — auth state is handled inside each screen.
   switchTab(tab) {
-    if (!State.isSignedIn && tab !== 'settings') {
-      document.getElementById('screen-auth').style.display = 'flex';
-      return;
-    }
-    document.getElementById('screen-auth').style.display = 'none';
-
     this.currentTab = tab;
     State.currentTab = tab;
 
@@ -1084,9 +1036,10 @@ const App = {
     document.getElementById(`tab-${tab}`).classList.add('active');
     document.getElementById(`screen-${tab}`).classList.add('active');
 
-    if (tab === 'labour') Labour.init();
+    if (tab === 'labour')    Labour.init();
+    if (tab === 'costs')     Costs.onTabOpen();
     if (tab === 'dashboard') Dashboard.load();
-    if (tab === 'settings') this.populateSettings();
+    if (tab === 'settings')  this.populateSettings();
   },
 
   closeModal(id) {
@@ -1144,7 +1097,7 @@ const Settings = {
 
     document.getElementById('project-name-display').textContent = State.get('projectName', 'ECM Solar Farm');
     App.updateAuthUI();
-    App.showToast('Settings saved', 'success');
+    App.showToast('Settings saved ✓', 'success');
   },
 
   signOut() {
@@ -1222,12 +1175,40 @@ const Labour = {
   todayAttendanceLoaded: false,
 
   init() {
+    if (!State.isSignedIn) {
+      this._showSignInCard('labour-worker-list', 'Labour Tracker');
+      document.getElementById('labour-save-btn').style.display = 'none';
+      document.getElementById('labour-weekly-summary').style.display = 'none';
+      return;
+    }
     if (!this.selectedDate) {
       this.selectedDate = new Date();
       this.selectedDate.setHours(0,0,0,0);
     }
     this.updateDateDisplay();
     this.loadWorkers();
+  },
+
+  _showSignInCard(containerId, featureName) {
+    const hasClientId = !!State.get('clientId');
+    document.getElementById(containerId).innerHTML = `
+      <div class="signin-card">
+        <div class="auth-logo">🔒</div>
+        <div class="auth-title">Sign in required</div>
+        <div class="auth-sub">${hasClientId
+          ? `Sign in with Google to use ${featureName}.`
+          : `Set up your Google Client ID in Settings, then sign in.`
+        }</div>
+        ${hasClientId
+          ? `<button class="btn btn-primary" onclick="App.signIn()" style="max-width:260px">
+               <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
+               Sign in with Google
+             </button>`
+          : `<button class="btn btn-secondary" onclick="App.switchTab('settings')" style="max-width:260px">
+               ⚙️ Go to Settings
+             </button>`
+        }
+      </div>`;
   },
 
   updateDateDisplay() {
@@ -1581,6 +1562,38 @@ const Costs = {
   currentFileType: null,
   extractedData: null,
 
+  onTabOpen() {
+    // Show sign-in card over the upload zone if not authenticated
+    const zone = document.getElementById('upload-zone');
+    const existing = document.getElementById('costs-signin-card');
+    if (!State.isSignedIn) {
+      if (!existing) {
+        const hasClientId = !!State.get('clientId');
+        const card = document.createElement('div');
+        card.id = 'costs-signin-card';
+        card.className = 'signin-card';
+        card.style.marginBottom = '12px';
+        card.innerHTML = hasClientId
+          ? `<div class="auth-logo">🔒</div>
+             <div class="auth-title">Sign in required</div>
+             <div class="auth-sub">Sign in with Google to scan and save invoices.</div>
+             <button class="btn btn-primary" onclick="App.signIn()" style="max-width:260px">
+               <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
+               Sign in with Google
+             </button>`
+          : `<div class="auth-logo">⚙️</div>
+             <div class="auth-title">Setup required</div>
+             <div class="auth-sub">Enter your Google Client ID in Settings first.</div>
+             <button class="btn btn-secondary" onclick="App.switchTab('settings')" style="max-width:260px">Go to Settings</button>`;
+        zone.parentNode.insertBefore(card, zone);
+      }
+      zone.style.display = 'none';
+    } else {
+      if (existing) existing.remove();
+      zone.style.display = '';
+    }
+  },
+
   triggerUpload() {
     document.getElementById('invoice-file-input').click();
   },
@@ -1882,6 +1895,48 @@ If a field cannot be determined, use null. For amounts, use numbers not strings.
 // ═══════════════════════════════════════════════════════
 const Dashboard = {
   async load() {
+    if (!State.isSignedIn) {
+      const hasClientId = !!State.get('clientId');
+      document.getElementById('dash-categories').innerHTML = '';
+      document.getElementById('dash-workers-list').innerHTML = '';
+      // Show sign-in card in the stat area
+      document.getElementById('dash-total-spend').textContent = '—';
+      document.getElementById('dash-labour-cost').textContent = '—';
+      document.getElementById('dash-days').textContent = '—';
+      document.getElementById('dash-workers').textContent = '—';
+      document.getElementById('budget-card').style.display = 'none';
+      document.getElementById('dashboard-updated').textContent = hasClientId
+        ? 'Sign in to load data'
+        : 'Configure Settings to get started';
+      // Inline sign-in card below stats
+      const existing = document.getElementById('dash-signin-card');
+      if (!existing) {
+        const card = document.createElement('div');
+        card.id = 'dash-signin-card';
+        card.className = 'signin-card';
+        card.style.marginBottom = '12px';
+        card.innerHTML = hasClientId
+          ? `<div class="auth-logo">🔒</div>
+             <div class="auth-title">Sign in required</div>
+             <div class="auth-sub">Sign in with Google to view the dashboard.</div>
+             <button class="btn btn-primary" onclick="App.signIn()" style="max-width:260px">
+               <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
+               Sign in with Google
+             </button>`
+          : `<div class="auth-logo">⚙️</div>
+             <div class="auth-title">Setup required</div>
+             <div class="auth-sub">Enter your Google Client ID in Settings to get started.</div>
+             <button class="btn btn-secondary" onclick="App.switchTab('settings')" style="max-width:260px">Go to Settings</button>`;
+        // Insert before the category card
+        const catCard = document.querySelector('#screen-dashboard .card');
+        catCard.parentNode.insertBefore(card, catCard);
+      }
+      return;
+    }
+    // Remove sign-in card if present (user just signed in)
+    const signinCard = document.getElementById('dash-signin-card');
+    if (signinCard) signinCard.remove();
+
     const sheetId = State.get('sheetId');
     if (!sheetId) {
       App.showToast('Configure Sheet ID in Settings', 'error');
