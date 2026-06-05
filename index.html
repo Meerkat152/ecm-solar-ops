@@ -388,16 +388,19 @@
   </div>
 
   <div id="content">
-    <!-- Auth Screen (shown when not signed in) -->
+    <!-- Auth Screen (shown when not signed in and clientId is set) -->
     <div id="screen-auth">
       <div class="auth-logo">⚡</div>
       <div class="auth-title">Solar Ops</div>
-      <div class="auth-sub">Site operations tool for ECM Solar Farm. Sign in with Google to continue.</div>
-      <button class="btn btn-primary" onclick="App.signIn()" style="max-width:300px">
+      <div class="auth-sub" id="auth-screen-sub">Sign in with Google to continue.</div>
+      <button class="btn btn-primary" id="auth-signin-btn" onclick="App.signIn()" style="max-width:300px;display:none">
         <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 110-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0012.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
         Sign in with Google
       </button>
-      <p class="text-muted" style="font-size:12px">You'll be asked to grant access to Google Sheets and Drive</p>
+      <button class="btn btn-secondary" id="auth-setup-btn" onclick="App.switchTab('settings')" style="max-width:300px;display:none">
+        ⚙️ Open Settings to configure
+      </button>
+      <p class="text-muted" style="font-size:12px" id="auth-screen-hint"></p>
     </div>
 
     <!-- Labour Screen -->
@@ -588,6 +591,11 @@
 
       <div class="settings-section">
         <div class="settings-section-title">Google Account</div>
+        <div class="form-group">
+          <label class="form-label">Google OAuth Client ID</label>
+          <input type="text" id="settings-client-id" class="form-input" placeholder="xxxxxxxxxxxx.apps.googleusercontent.com" autocomplete="off">
+          <p class="text-muted" style="margin-top:6px">From Google Cloud Console → APIs &amp; Services → Credentials</p>
+        </div>
         <div id="settings-auth-info" class="card" style="margin-bottom:12px">
           <div class="text-muted">Not signed in</div>
         </div>
@@ -873,7 +881,7 @@ const OAuth = {
     if (!clientId) {
       App.showToast('Enter your Google Client ID in Settings first', 'error');
       App.switchTab('settings');
-      return;
+      return Promise.reject(new Error('no_client_id'));
     }
 
     const redirectUri = window.location.origin + window.location.pathname;
@@ -968,7 +976,12 @@ const App = {
       sessionStorage.removeItem('oauth_return_tab');
       this.switchTab(returnTab);
       if (wasRedirect) App.showToast('Signed in successfully', 'success');
+    } else if (!State.get('clientId')) {
+      // No client ID configured yet — go straight to Settings so user can configure
+      this.switchTab('settings');
+      App.showToast('Welcome! Enter your Google Client ID to get started.', 'info');
     } else {
+      // Client ID exists but not signed in — show sign-in screen
       document.getElementById('screen-auth').style.display = 'flex';
     }
   },
@@ -978,19 +991,48 @@ const App = {
     const label = document.getElementById('auth-label');
     const settingsBtn = document.getElementById('settings-auth-btn');
     const settingsInfo = document.getElementById('settings-auth-info');
+    const hasClientId = !!State.get('clientId');
 
+    // Header status dot
     if (State.isSignedIn) {
       dot.className = 'dot connected';
       label.textContent = 'Connected';
-      settingsBtn.textContent = 'Sign Out';
-      settingsBtn.onclick = () => App.signOut();
-      settingsInfo.innerHTML = '<span class="badge badge-green">✓ Signed in to Google</span>';
     } else {
       dot.className = 'dot';
       label.textContent = 'Not signed in';
+    }
+
+    // Settings screen auth section
+    if (State.isSignedIn) {
+      settingsBtn.textContent = 'Sign Out';
+      settingsBtn.onclick = () => App.signOut();
+      settingsInfo.innerHTML = '<span class="badge badge-green">✓ Signed in to Google</span>';
+    } else if (hasClientId) {
       settingsBtn.textContent = 'Sign in with Google';
       settingsBtn.onclick = () => App.signIn();
       settingsInfo.innerHTML = '<div class="text-muted">Not signed in</div>';
+    } else {
+      settingsBtn.textContent = 'Sign in with Google';
+      settingsBtn.onclick = () => App.signIn();
+      settingsInfo.innerHTML = '<div class="text-muted" style="font-size:12px">Enter your Google Client ID above, then save settings before signing in.</div>';
+    }
+
+    // Auth screen (sign-in wall) — only shown when clientId is set but not signed in
+    const authSigninBtn = document.getElementById('auth-signin-btn');
+    const authSetupBtn = document.getElementById('auth-setup-btn');
+    const authSub = document.getElementById('auth-screen-sub');
+    const authHint = document.getElementById('auth-screen-hint');
+
+    if (hasClientId) {
+      authSigninBtn.style.display = '';
+      authSetupBtn.style.display = 'none';
+      authSub.textContent = 'Sign in with Google to access the app.';
+      authHint.textContent = "You'll be asked to grant access to Google Sheets and Drive.";
+    } else {
+      authSigninBtn.style.display = 'none';
+      authSetupBtn.style.display = '';
+      authSub.textContent = 'Configure your Google Client ID in Settings to get started.';
+      authHint.textContent = '';
     }
   },
 
@@ -1006,7 +1048,7 @@ const App = {
       App.switchTab('labour');
     } catch(e) {
       App.hideLoading();
-      if (e.message !== 'popup blocked') {
+      if (e.message !== 'popup blocked' && e.message !== 'no_client_id') {
         App.showToast('Sign in failed: ' + e.message, 'error');
       }
     }
@@ -1076,13 +1118,13 @@ const App = {
   },
 
   populateSettings() {
+    document.getElementById('settings-client-id').value = State.get('clientId', '');
     document.getElementById('settings-sheet-id').value = State.get('sheetId');
     document.getElementById('settings-folder-id').value = State.get('folderId');
     document.getElementById('settings-project-name').value = State.get('projectName', 'ECM Solar Farm');
     document.getElementById('settings-budget').value = State.get('budget', '');
     document.getElementById('settings-daily-rate').value = State.get('dailyRate', '180');
     document.getElementById('settings-api-key').value = State.get('anthropicKey', '');
-    // Note: clientId shown separately
   }
 };
 
@@ -1091,6 +1133,7 @@ const App = {
 // ═══════════════════════════════════════════════════════
 const Settings = {
   save() {
+    State.set('clientId', document.getElementById('settings-client-id').value.trim());
     State.set('sheetId', document.getElementById('settings-sheet-id').value.trim());
     State.set('folderId', document.getElementById('settings-folder-id').value.trim());
     State.set('projectName', document.getElementById('settings-project-name').value.trim() || 'ECM Solar Farm');
@@ -1100,6 +1143,7 @@ const Settings = {
     State.saveSettings();
 
     document.getElementById('project-name-display').textContent = State.get('projectName', 'ECM Solar Farm');
+    App.updateAuthUI();
     App.showToast('Settings saved', 'success');
   },
 
