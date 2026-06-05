@@ -414,12 +414,19 @@ body {
                 <input type="date" id="inv-date" class="form-input">
               </div>
               <div class="form-group">
-                <label class="form-label">Total Amount (&#163;)</label>
-                <input type="number" id="inv-total" class="form-input" step="0.01" placeholder="0.00">
+                <label class="form-label">Amount Ex VAT (R)</label>
+                <input type="number" id="inv-exvat" class="form-input" step="0.01" placeholder="0.00"
+                       oninput="Costs.calcVat()">
               </div>
               <div class="form-group">
-                <label class="form-label">VAT Amount (&#163;)</label>
-                <input type="number" id="inv-vat" class="form-input" step="0.01" placeholder="0.00">
+                <label class="form-label">VAT @ 15% (R)</label>
+                <input type="number" id="inv-vat" class="form-input" step="0.01" placeholder="0.00"
+                       oninput="Costs.calcTotal()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Total Inc VAT (R)</label>
+                <input type="number" id="inv-total" class="form-input" step="0.01" placeholder="0.00" readonly
+                       style="opacity:0.7;cursor:default">
               </div>
               <div class="form-group">
                 <label class="form-label">Category</label>
@@ -458,10 +465,22 @@ body {
         <div class="text-muted" id="dash-updated" style="font-size:12px">—</div>
       </div>
       <div class="stat-grid">
-        <div class="stat-card"><div class="stat-val" id="ds-spend">—</div><div class="stat-lbl">Total Spend</div></div>
-        <div class="stat-card"><div class="stat-val" id="ds-labour">—</div><div class="stat-lbl">Labour Cost</div></div>
+        <div class="stat-card"><div class="stat-val" id="ds-spend">—</div><div class="stat-lbl">Total Spend Ex VAT</div></div>
+        <div class="stat-card"><div class="stat-val" id="ds-labour">—</div><div class="stat-lbl">Labour Cost Ex VAT</div></div>
         <div class="stat-card"><div class="stat-val" id="ds-days">—</div><div class="stat-lbl">Working Days</div></div>
         <div class="stat-card"><div class="stat-val" id="ds-workers">—</div><div class="stat-lbl">Active Workers</div></div>
+      </div>
+      <div class="card" id="ds-vat-card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">VAT Total (15%) — cashflow ref</div>
+            <div class="stat-val" id="ds-vat" style="margin-top:4px">—</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Total Inc VAT</div>
+            <div style="font-size:18px;font-weight:700;margin-top:4px" id="ds-incvat">—</div>
+          </div>
+        </div>
       </div>
       <div id="ds-budget-card" class="card" style="display:none">
         <div class="card-title">Budget</div>
@@ -518,12 +537,12 @@ body {
           <input type="text" id="s-proj-name" class="form-input" placeholder="ECM Solar Farm">
         </div>
         <div class="form-group">
-          <label class="form-label">Project Budget (&#163;, optional)</label>
-          <input type="number" id="s-budget" class="form-input" placeholder="e.g. 500000">
+          <label class="form-label">Project Budget Ex VAT (R)</label>
+          <input type="number" id="s-budget" class="form-input" placeholder="e.g. 4500000">
         </div>
         <div class="form-group">
-          <label class="form-label">Default Daily Labour Rate (&#163;)</label>
-          <input type="number" id="s-rate" class="form-input" placeholder="e.g. 180">
+          <label class="form-label">Default Daily Labour Rate (R)</label>
+          <input type="number" id="s-rate" class="form-input" placeholder="e.g. 1800">
         </div>
       </div>
 
@@ -607,7 +626,7 @@ body {
       <input type="date" id="nw-date" class="form-input">
     </div>
     <div class="form-group">
-      <label class="form-label">Daily Rate (&#163;) — leave blank for default</label>
+      <label class="form-label">Daily Rate Ex VAT (R) — leave blank for default</label>
       <input type="number" id="nw-rate" class="form-input" placeholder="Leave blank for default">
     </div>
     <button class="btn btn-primary" onclick="Labour.addWorker()" style="margin-bottom:8px">Add Worker</button>
@@ -852,8 +871,8 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
-function fmtGBP(n) {
-  return '&#163;' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+function fmtR(n) {
+  return 'R' + Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -980,8 +999,8 @@ var Settings = {
     document.getElementById('s-sheet-id').value  = State.get('sheetId');
     document.getElementById('s-folder-id').value = State.get('folderId');
     document.getElementById('s-proj-name').value = State.get('projName', 'ECM Solar Farm');
-    document.getElementById('s-budget').value    = State.get('budget', '');
-    document.getElementById('s-rate').value      = State.get('dailyRate', '180');
+    document.getElementById('s-budget').value    = State.get('budget', '4500000');
+    document.getElementById('s-rate').value      = State.get('dailyRate', '1800');
     document.getElementById('s-api-key').value   = State.get('anthropicKey', '');
     App.updateAuthUI();
   },
@@ -992,7 +1011,7 @@ var Settings = {
     State.set('folderId',     document.getElementById('s-folder-id').value.trim());
     State.set('projName',     document.getElementById('s-proj-name').value.trim() || 'ECM Solar Farm');
     State.set('budget',       document.getElementById('s-budget').value);
-    State.set('dailyRate',    document.getElementById('s-rate').value || '180');
+    State.set('dailyRate',    document.getElementById('s-rate').value || '1800');
     State.set('anthropicKey', document.getElementById('s-api-key').value.trim());
     State.saveCfg();
     document.getElementById('proj-name').textContent = State.get('projName', 'ECM Solar Farm');
@@ -1016,7 +1035,7 @@ var Settings = {
       var required = [
         { name: 'Workers',   headers: ['ID', 'Full Name', 'Daily Rate', 'Start Date', 'Active'] },
         { name: 'Labour',    headers: ['Date', 'Worker Name', 'Worker ID', 'Status', 'Daily Rate', 'Pay'] },
-        { name: 'Costs',     headers: ['Date', 'Supplier', 'Invoice Number', 'Total', 'VAT', 'Category', 'Notes', 'Drive File ID'] },
+        { name: 'Costs',     headers: ['Date', 'Supplier', 'Invoice Number', 'Ex VAT', 'VAT (15%)', 'Total Inc VAT', 'Category', 'Notes', 'Drive File ID'] },
         { name: 'Dashboard', headers: ['Metric', 'Value'] }
       ];
       var adds = [];
@@ -1037,11 +1056,13 @@ var Settings = {
       return chain;
     }).then(function () {
       return GApi.updateRange(sheetId, 'Dashboard!A2', [
-        ['Total Labour Cost',    '=SUM(Labour!F:F)'],
-        ['Total Invoice Spend',  '=SUM(Costs!D:D)'],
-        ['Total Project Spend',  '=SUM(Labour!F:F)+SUM(Costs!D:D)'],
-        ['Working Days Logged',  '=COUNTA(UNIQUE(Labour!A2:A))'],
-        ['Active Workers',       '=COUNTIF(Workers!E:E,"TRUE")']
+        ['Total Labour Ex VAT',        '=SUM(Labour!F:F)'],
+        ['Total Invoice Spend Ex VAT', '=SUM(Costs!D:D)'],
+        ['Total Project Spend Ex VAT', '=SUM(Labour!F:F)+SUM(Costs!D:D)'],
+        ['Total VAT',                  '=SUM(Costs!E:E)'],
+        ['Total Inc VAT',              '=SUM(Labour!F:F)+SUM(Costs!F:F)'],
+        ['Working Days Logged',        '=COUNTA(UNIQUE(Labour!A2:A))'],
+        ['Active Workers',             '=COUNTIF(Workers!E:E,"TRUE")']
       ]);
     }).then(function () {
       App.hideLoading();
@@ -1126,7 +1147,7 @@ var Labour = {
           return {
             id:   r[0] || '',
             name: r[1] || '',
-            rate: parseFloat(r[2]) || parseFloat(State.get('dailyRate', '180'))
+            rate: parseFloat(r[2]) || parseFloat(State.get('dailyRate', '1800'))
           };
         });
       App.hideLoading();
@@ -1175,7 +1196,7 @@ var Labour = {
       html += '<div class="worker-row" id="wr-' + btoa(unescape(encodeURIComponent(key))).replace(/[^a-zA-Z0-9]/g, '_') + '">' +
         '<div class="worker-info">' +
           '<div class="worker-name">' + esc(w.name) + '</div>' +
-          '<div class="worker-meta">&#163;' + w.rate + '/day</div>' +
+          '<div class="worker-meta">R' + w.rate.toLocaleString('en-ZA') + '/day Ex VAT</div>' +
         '</div>' +
         '<div class="att-wrap">' +
           '<button class="att-btn' + (status === 'present' ? ' present' : '') + '" ' +
@@ -1285,7 +1306,7 @@ var Labour = {
       html += '<div class="sum-row">' +
         '<div><div style="font-weight:600">' + esc(n) + '</div>' +
         '<div class="text-muted">' + days[n] + ' day' + (days[n] !== 1 ? 's' : '') + '</div></div>' +
-        '<div style="font-weight:700;color:var(--accent)">&#163;' + totals[n].toFixed(2) + '</div>' +
+        '<div style="font-weight:700;color:var(--accent)">R' + totals[n].toFixed(2) + '</div>' +
       '</div>';
     });
     document.getElementById('labour-totals').innerHTML = html;
@@ -1302,7 +1323,7 @@ var Labour = {
     var name   = document.getElementById('nw-name').value.trim();
     var date   = document.getElementById('nw-date').value;
     var rateIn = document.getElementById('nw-rate').value;
-    var rate   = rateIn ? parseFloat(rateIn) : parseFloat(State.get('dailyRate', '180'));
+    var rate   = rateIn ? parseFloat(rateIn) : parseFloat(State.get('dailyRate', '1800'));
     if (!name) { App.toast('Enter worker name', 'error'); return; }
     var sheetId = State.get('sheetId');
     if (!sheetId) { App.toast('No Sheet ID configured', 'error'); return; }
@@ -1394,9 +1415,13 @@ var Costs = {
           ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } }
           : { type: 'image',    source: { type: 'base64', media_type: file.type,           data: b64 } },
         { type: 'text', text:
-          'Extract invoice data and return ONLY valid JSON with keys: ' +
-          'supplier, invoiceNumber, date (YYYY-MM-DD), lineItems ([{description,amount}]), ' +
-          'vat (number), total (number). Use null for missing fields.' }
+          'Extract invoice data and return ONLY valid JSON, no markdown. Keys: ' +
+          'supplier (string), invoiceNumber (string), date (YYYY-MM-DD string), ' +
+          'lineItems ([{description, amount}] where amount is Ex VAT), ' +
+          'exVat (number, amount excluding VAT), vat (number, VAT amount at 15%), ' +
+          'totalIncVat (number, total including VAT). ' +
+          'If exVat is missing but totalIncVat is present, derive exVat = totalIncVat / 1.15. ' +
+          'Use null for fields that cannot be determined.' }
       ];
       return fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -1433,9 +1458,22 @@ var Costs = {
     document.getElementById('inv-supplier').value = d.supplier      || '';
     document.getElementById('inv-number').value   = d.invoiceNumber || '';
     document.getElementById('inv-date').value     = d.date          || new Date().toISOString().split('T')[0];
-    document.getElementById('inv-total').value    = d.total         || '';
-    document.getElementById('inv-vat').value      = d.vat           || '';
     document.getElementById('inv-notes').value    = '';
+
+    // Populate Ex VAT, VAT, Total Inc VAT — derive any missing value
+    var exVat = parseFloat(d.exVat) || 0;
+    var vat   = parseFloat(d.vat)   || 0;
+    var total = parseFloat(d.totalIncVat) || 0;
+    // If exVat provided but vat missing, calculate vat
+    if (exVat && !vat) { vat   = Math.round(exVat * 0.15 * 100) / 100; }
+    // If vat provided but exVat missing, back-calculate
+    if (vat && !exVat) { exVat = Math.round((vat / 0.15) * 100) / 100; }
+    // Recalculate total from exVat + vat
+    if (exVat || vat)  { total = Math.round((exVat + vat) * 100) / 100; }
+
+    document.getElementById('inv-exvat').value = exVat || '';
+    document.getElementById('inv-vat').value   = vat   || '';
+    document.getElementById('inv-total').value = total || '';
 
     var liSec  = document.getElementById('inv-lineitems');
     var liBody = document.getElementById('inv-li-body');
@@ -1444,7 +1482,7 @@ var Costs = {
       var html = '<table class="li-table"><thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead><tbody>';
       d.lineItems.forEach(function (item) {
         html += '<tr><td>' + esc(item.description || '') + '</td>' +
-          '<td style="text-align:right">&#163;' + (item.amount || 0).toFixed(2) + '</td></tr>';
+          '<td style="text-align:right">R' + (item.amount || 0).toFixed(2) + '</td></tr>';
       });
       liBody.innerHTML = html + '</tbody></table>';
     } else {
@@ -1463,10 +1501,14 @@ var Costs = {
 
     var invNum  = document.getElementById('inv-number').value.trim();
     var invDate = document.getElementById('inv-date').value;
-    var total   = parseFloat(document.getElementById('inv-total').value) || 0;
+    var exVat   = parseFloat(document.getElementById('inv-exvat').value) || 0;
     var vat     = parseFloat(document.getElementById('inv-vat').value)   || 0;
+    var total   = parseFloat(document.getElementById('inv-total').value) || 0;
     var cat     = document.getElementById('inv-cat').value;
     var notes   = document.getElementById('inv-notes').value.trim();
+    // Ensure totals are consistent before saving
+    if (exVat && !vat)   { vat   = Math.round(exVat * 0.15 * 100) / 100; }
+    if (exVat || vat)    { total = Math.round((exVat + vat) * 100) / 100; }
 
     App.showLoading('Saving invoice&#8230;');
 
@@ -1485,8 +1527,8 @@ var Costs = {
       : Promise.resolve('');
 
     drivePromise.then(function (driveId) {
-      return GApi.appendRows(sheetId, 'Costs!A:H',
-        [[invDate, supplier, invNum, total, vat, cat, notes, driveId]]);
+      return GApi.appendRows(sheetId, 'Costs!A:I',
+        [[invDate, supplier, invNum, exVat, vat, total, cat, notes, driveId]]);
     }).then(function () {
       App.hideLoading();
       App.toast('Invoice saved!', 'success');
@@ -1499,10 +1541,28 @@ var Costs = {
 
   reset: function () {
     Costs.file = null;
-    document.getElementById('costs-extract').style.display  = 'none';
-    document.getElementById('inv-preview').style.display    = 'none';
+    document.getElementById('costs-extract').style.display   = 'none';
+    document.getElementById('inv-preview').style.display     = 'none';
     document.getElementById('extract-loading').style.display = 'none';
-    document.getElementById('extract-form').style.display   = 'none';
+    document.getElementById('extract-form').style.display    = 'none';
+    ['inv-exvat','inv-vat','inv-total'].forEach(function (id) {
+      document.getElementById(id).value = '';
+    });
+  },
+
+  // Auto-calculate VAT (15%) and Total from Ex VAT field
+  calcVat: function () {
+    var exVat = parseFloat(document.getElementById('inv-exvat').value) || 0;
+    var vat   = Math.round(exVat * 0.15 * 100) / 100;
+    document.getElementById('inv-vat').value   = exVat ? vat.toFixed(2)              : '';
+    document.getElementById('inv-total').value = exVat ? (exVat + vat).toFixed(2)    : '';
+  },
+
+  // Recalculate Total when VAT is manually edited
+  calcTotal: function () {
+    var exVat = parseFloat(document.getElementById('inv-exvat').value) || 0;
+    var vat   = parseFloat(document.getElementById('inv-vat').value)   || 0;
+    document.getElementById('inv-total').value = (exVat + vat).toFixed(2);
   },
 
   showHistory: function () {
@@ -1512,16 +1572,17 @@ var Costs = {
     var sheetId = State.get('sheetId');
     if (!sheetId) { el.innerHTML = '<div class="text-muted">No Sheet ID configured</div>'; return; }
 
-    GApi.getRange(sheetId, 'Costs!A:G').then(function (res) {
+    GApi.getRange(sheetId, 'Costs!A:I').then(function (res) {
       var rows = (res.values || []).slice(1).reverse().slice(0, 20);
       if (!rows.length) { el.innerHTML = '<div class="text-muted">No invoices yet</div>'; return; }
       var html = '';
       rows.forEach(function (r) {
+        // Cols: Date(0) Supplier(1) InvNum(2) ExVAT(3) VAT(4) TotalIncVAT(5) Category(6) Notes(7)
         html += '<div class="sum-row">' +
           '<div><div style="font-weight:600">' + esc(r[1] || '—') + '</div>' +
-          '<div class="text-muted">' + esc(r[0] || '') + ' &middot; ' + esc(r[5] || '') + '</div></div>' +
+          '<div class="text-muted">' + esc(r[0] || '') + ' &middot; ' + esc(r[6] || '') + '</div></div>' +
           '<div style="text-align:right">' +
-          '<div style="font-weight:700;color:var(--accent)">&#163;' + parseFloat(r[3] || 0).toFixed(2) + '</div>' +
+          '<div style="font-weight:700;color:var(--accent)">R' + parseFloat(r[3] || 0).toFixed(2) + ' Ex VAT</div>' +
           '<div class="text-muted" style="font-size:11px">' + esc(r[2] || '') + '</div>' +
           '</div></div>';
       });
@@ -1539,7 +1600,7 @@ var Dashboard = {
   load: function () {
     if (!State.isSignedIn) {
       document.getElementById('dash-updated').textContent = '— not signed in';
-      ['ds-spend','ds-labour','ds-days','ds-workers'].forEach(function (id) {
+      ['ds-spend','ds-labour','ds-days','ds-workers','ds-vat','ds-incvat'].forEach(function (id) {
         document.getElementById(id).textContent = '—';
       });
       document.getElementById('ds-budget-card').style.display = 'none';
@@ -1576,33 +1637,41 @@ var Dashboard = {
         wDays[n]   = (wDays[n]   || 0) + 1;
       });
 
-      var totalCosts = 0;
-      var catTotals  = {};
+      // Costs: col D (idx 3) = Ex VAT, col E (idx 4) = VAT, col F (idx 5) = Total Inc VAT
+      // Category is now col G (idx 6)
+      var totalCostsExVat = 0;
+      var totalVat        = 0;
+      var catTotals       = {};
       costsRows.forEach(function (r) {
-        var amt = parseFloat(r[3]) || 0;
-        totalCosts += amt;
-        var cat = r[5] || 'Other';
-        catTotals[cat] = (catTotals[cat] || 0) + amt;
+        var exv = parseFloat(r[3]) || 0;
+        var v   = parseFloat(r[4]) || 0;
+        totalCostsExVat += exv;
+        totalVat        += v;
+        var cat = r[6] || 'Other';
+        catTotals[cat] = (catTotals[cat] || 0) + exv;
       });
 
-      var totalSpend   = totalLabour + totalCosts;
-      var activeWorkers = workerRows.filter(function (r) { return r[4] !== 'FALSE'; }).length;
-      var daysCount     = Object.keys(uniqueDays).length;
+      var totalSpendExVat = totalLabour + totalCostsExVat;
+      var totalIncVat     = totalSpendExVat + totalVat;
+      var activeWorkers   = workerRows.filter(function (r) { return r[4] !== 'FALSE'; }).length;
+      var daysCount       = Object.keys(uniqueDays).length;
 
-      document.getElementById('ds-spend').innerHTML   = fmtGBP(totalSpend);
-      document.getElementById('ds-labour').innerHTML  = fmtGBP(totalLabour);
+      document.getElementById('ds-spend').innerHTML   = fmtR(totalSpendExVat);
+      document.getElementById('ds-labour').innerHTML  = fmtR(totalLabour);
       document.getElementById('ds-days').textContent  = daysCount;
       document.getElementById('ds-workers').textContent = activeWorkers;
+      document.getElementById('ds-vat').innerHTML     = fmtR(totalVat);
+      document.getElementById('ds-incvat').innerHTML  = fmtR(totalIncVat);
 
-      // Budget
-      var budget     = parseFloat(State.get('budget'));
+      // Budget vs spend — Ex VAT only
+      var budget     = parseFloat(State.get('budget', '4500000'));
       var budgetCard = document.getElementById('ds-budget-card');
       if (budget > 0) {
         budgetCard.style.display = 'block';
-        var pct = Math.min((totalSpend / budget) * 100, 100);
-        document.getElementById('ds-bspent').innerHTML = fmtGBP(totalSpend);
-        document.getElementById('ds-btotal').innerHTML = fmtGBP(budget);
-        document.getElementById('ds-brem').innerHTML   = fmtGBP(Math.max(budget - totalSpend, 0)) + ' remaining';
+        var pct = Math.min((totalSpendExVat / budget) * 100, 100);
+        document.getElementById('ds-bspent').innerHTML = fmtR(totalSpendExVat);
+        document.getElementById('ds-btotal').innerHTML = fmtR(budget);
+        document.getElementById('ds-brem').innerHTML   = fmtR(Math.max(budget - totalSpendExVat, 0)) + ' Ex VAT remaining';
         var bar = document.getElementById('ds-bbar');
         bar.style.width = pct + '%';
         bar.className   = 'bbar-fill' + (pct > 90 ? ' danger' : pct > 70 ? ' warn' : '');
@@ -1623,7 +1692,7 @@ var Dashboard = {
             '<div class="cat-name">' + esc(c) + '</div>' +
             '<div class="cat-bar"><div class="cat-bar-fill" style="width:' +
               ((catTotals[c] / maxC) * 100).toFixed(1) + '%"></div></div>' +
-            '<div class="cat-amt">' + fmtGBP(catTotals[c]) + '</div>' +
+            '<div class="cat-amt">' + fmtR(catTotals[c]) + '</div>' +
           '</div>';
         });
         document.getElementById('ds-cats').innerHTML = html;
@@ -1640,7 +1709,7 @@ var Dashboard = {
           whtml += '<div class="sum-row">' +
             '<div><div style="font-weight:600">' + esc(n) + '</div>' +
             '<div class="text-muted">' + wDays[n] + ' day' + (wDays[n] !== 1 ? 's' : '') + '</div></div>' +
-            '<div style="font-weight:700;color:var(--accent)">&#163;' + wTotals[n].toFixed(2) + '</div>' +
+            '<div style="font-weight:700;color:var(--accent)">R' + wTotals[n].toFixed(2) + '</div>' +
           '</div>';
         });
         document.getElementById('ds-wsummary').innerHTML = whtml;
