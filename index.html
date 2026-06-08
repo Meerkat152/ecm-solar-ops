@@ -928,13 +928,28 @@ var Settings = {
         ['Active Workers',             '=COUNTIF(Workers!E:E,"TRUE")']
       ]);
 
-    // Step 4: get fresh meta for sheet IDs then apply formatting
+    // Step 4: fetch fresh meta including banded ranges so we can clean them up
+    //         before re-applying, ensuring idempotent re-runs.
     }).then(function () {
-      return GApi.getMeta(sid);
+      return GApi.request('GET',
+        'https://sheets.googleapis.com/v4/spreadsheets/' + sid +
+        '?fields=sheets(properties,bandedRanges)');
     }).then(function (meta) {
-      var map = {};
-      meta.sheets.forEach(function (s) { map[s.properties.title] = s.properties.sheetId; });
-      var fmtReqs = Settings._buildFormatRequests(map);
+      var sheetMap  = {};
+      var delBandReqs = [];
+      meta.sheets.forEach(function (s) {
+        sheetMap[s.properties.title] = s.properties.sheetId;
+        // Remove existing banded ranges so re-running initSheet doesn't stack them
+        if (s.bandedRanges) {
+          s.bandedRanges.forEach(function (br) {
+            delBandReqs.push({ deleteBanding: { bandedRangeId: br.bandedRangeId } });
+          });
+        }
+      });
+      var p = delBandReqs.length ? GApi.batchUpdate(sid, delBandReqs) : Promise.resolve();
+      return p.then(function () { return sheetMap; });
+    }).then(function (sheetMap) {
+      var fmtReqs = Settings._buildFormatRequests(sheetMap);
       return fmtReqs.length ? GApi.batchUpdate(sid, fmtReqs) : Promise.resolve();
 
     }).then(function () {
@@ -946,93 +961,133 @@ var Settings = {
     });
   },
 
-  _buildFormatRequests: function (map) {
+  _buildFormatRequests: function (sheetMap) {
     var reqs = [];
 
-    function freeze(sheetId) {
+    // ── Colour palette ─────────────────────────────────────────
+    var NAVY   = { red: 0.118, green: 0.161, blue: 0.231 };  // #1e293b  header bg
+    var WHITE  = { red: 1,     green: 1,     blue: 1     };  // #ffffff  row 1, 3, 5…
+    var LGREY  = { red: 0.973, green: 0.980, blue: 0.988 };  // #f8fafc  row 2, 4, 6…
+    var DTEXT  = { red: 0.067, green: 0.094, blue: 0.153 };  // #111827  data text
+    var WTEXT  = { red: 1,     green: 1,     blue: 1     };  // #ffffff  header text
+    var BCLR   = { red: 0.878, green: 0.906, blue: 0.929 };  // #e0e7ed  cell borders
+
+    // ── Shared format atoms ─────────────────────────────────────
+    var THIN   = { style: 'SOLID', width: 1, color: BCLR };
+    var BORDERS = { top: THIN, bottom: THIN, left: THIN, right: THIN };
+    var DATE_FMT = { type: 'DATE',   pattern: 'yyyy-mm-dd'  };
+    var CURR_FMT = { type: 'NUMBER', pattern: '"R"#,##0.00' };
+    var NUM_FMT  = { type: 'NUMBER', pattern: '#,##0.00'    };
+    var MAX_ROW  = 1000;   // apply data formatting this many rows down
+
+    // ── Per-sheet schema ────────────────────────────────────────
+    // currRange: [startColIdx, endColIdx) for currency columns (right-align + R format)
+    // dateCols:  array of column indices with date format
+    var SHEETS = [
+      { name: 'Workers',   cols: 5, dateCols: [3],    currRange: [2, 3]  },  // Daily Rate
+      { name: 'Labour',    cols: 6, dateCols: [0],    currRange: [4, 6]  },  // Daily Rate, Pay
+      { name: 'Costs',     cols: 9, dateCols: [0],    currRange: [3, 6]  },  // Ex VAT, VAT, Total
+      { name: 'Payments',  cols: 6, dateCols: [0],    currRange: [3, 4]  },  // Amount Paid
+      { name: 'Dashboard', cols: 2, dateCols: [],     currRange: [1, 2]  }   // Value
+    ];
+
+    SHEETS.forEach(function (s) {
+      var sid = sheetMap[s.name];
+      if (sid === undefined) return;
+      var nc = s.cols;
+      var cr = s.currRange;   // [start, end)
+
+      // 1. Freeze header row
       reqs.push({ updateSheetProperties: {
-        properties: { sheetId: sheetId, gridProperties: { frozenRowCount: 1 } },
+        properties: { sheetId: sid, gridProperties: { frozenRowCount: 1 } },
         fields: 'gridProperties.frozenRowCount'
       }});
-    }
 
-    function boldHeader(sheetId, numCols) {
+      // 2. Header row ONLY (row index 0):
+      //    dark navy bg · white bold text · left-aligned · no borders needed
       reqs.push({ repeatCell: {
-        range: { sheetId: sheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: numCols },
+        range: { sheetId: sid, startRowIndex: 0, endRowIndex: 1,
+                 startColumnIndex: 0, endColumnIndex: nc },
         cell: { userEnteredFormat: {
-          textFormat: { bold: true },
-          backgroundColor: { red: 0.18, green: 0.18, blue: 0.28 }
+          backgroundColor: NAVY,
+          textFormat: { bold: true, foregroundColor: WTEXT, fontSize: 10 },
+          horizontalAlignment: 'LEFT',
+          verticalAlignment:   'MIDDLE',
+          padding: { top: 8, bottom: 8, left: 10, right: 10 }
         }},
-        fields: 'userEnteredFormat(textFormat,backgroundColor)'
+        fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment,padding)'
       }});
-    }
 
-    function dateFmt(sheetId, col) {
+      // 3. ALL data rows (1 → MAX_ROW): explicit white bg + dark text + borders + left-align.
+      //    This clears any stale navy from a previous broken run on every data cell.
       reqs.push({ repeatCell: {
-        range: { sheetId: sheetId, startRowIndex: 1, startColumnIndex: col, endColumnIndex: col + 1 },
-        cell: { userEnteredFormat: { numberFormat: { type: 'DATE', pattern: 'yyyy-mm-dd' } } },
-        fields: 'userEnteredFormat.numberFormat'
+        range: { sheetId: sid, startRowIndex: 1, endRowIndex: MAX_ROW,
+                 startColumnIndex: 0, endColumnIndex: nc },
+        cell: { userEnteredFormat: {
+          backgroundColor:    WHITE,
+          textFormat:         { bold: false, foregroundColor: DTEXT, fontSize: 10 },
+          horizontalAlignment:'LEFT',
+          verticalAlignment:  'MIDDLE',
+          borders:             BORDERS,
+          padding:             { top: 4, bottom: 4, left: 10, right: 10 }
+        }},
+        fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment,borders,padding)'
       }});
-    }
 
-    function numFmt(sheetId, startCol, endCol) {
-      reqs.push({ repeatCell: {
-        range: { sheetId: sheetId, startRowIndex: 1, startColumnIndex: startCol, endColumnIndex: endCol },
-        cell: { userEnteredFormat: { numberFormat: { type: 'NUMBER', pattern: '#,##0.00' } } },
-        fields: 'userEnteredFormat.numberFormat'
+      // 4. Alternating row banding on data rows.
+      //    Banding renders ON TOP of per-cell background in the Sheets rendering stack,
+      //    so odd rows show WHITE (overriding step 3's white — same colour, no change)
+      //    and even rows show LGREY (overriding step 3's white — shows grey). ✓
+      //    Step 3 still matters: it resets any stale navy on rows where banding has no effect
+      //    (e.g. if MAX_ROW extends beyond the banded range's rendered rows).
+      reqs.push({ addBanding: {
+        bandedRange: {
+          range: { sheetId: sid, startRowIndex: 1, startColumnIndex: 0, endColumnIndex: nc },
+          rowProperties: {
+            firstBandColor:  WHITE,   // rows 1, 3, 5 … (odd data rows)
+            secondBandColor: LGREY    // rows 2, 4, 6 … (even data rows)
+          }
+        }
       }});
-    }
 
-    function colW(sheetId, startCol, endCol, px) {
-      reqs.push({ updateDimensionProperties: {
-        range: { sheetId: sheetId, dimension: 'COLUMNS', startIndex: startCol, endIndex: endCol },
-        properties: { pixelSize: px },
-        fields: 'pixelSize'
+      // 5. Date columns: yyyy-mm-dd format
+      s.dateCols.forEach(function (col) {
+        reqs.push({ repeatCell: {
+          range: { sheetId: sid, startRowIndex: 1, endRowIndex: MAX_ROW,
+                   startColumnIndex: col, endColumnIndex: col + 1 },
+          cell: { userEnteredFormat: { numberFormat: DATE_FMT } },
+          fields: 'userEnteredFormat.numberFormat'
+        }});
+      });
+
+      // 6. Currency columns: "R"#,##0.00 format + right-aligned
+      if (cr[0] < cr[1]) {
+        reqs.push({ repeatCell: {
+          range: { sheetId: sid, startRowIndex: 1, endRowIndex: MAX_ROW,
+                   startColumnIndex: cr[0], endColumnIndex: cr[1] },
+          cell: { userEnteredFormat: {
+            numberFormat:        CURR_FMT,
+            horizontalAlignment: 'RIGHT'
+          }},
+          fields: 'userEnteredFormat(numberFormat,horizontalAlignment)'
+        }});
+      }
+
+      // 7. Dashboard Value column uses plain number format (it holds both currency and counts)
+      if (s.name === 'Dashboard') {
+        reqs.push({ repeatCell: {
+          range: { sheetId: sid, startRowIndex: 1, endRowIndex: MAX_ROW,
+                   startColumnIndex: 1, endColumnIndex: 2 },
+          cell: { userEnteredFormat: { numberFormat: NUM_FMT } },
+          fields: 'userEnteredFormat.numberFormat'
+        }});
+      }
+
+      // 8. Auto-resize all columns to fit content
+      reqs.push({ autoResizeDimensions: {
+        dimensions: { sheetId: sid, dimension: 'COLUMNS', startIndex: 0, endIndex: nc }
       }});
-    }
-
-    // Workers
-    var wid = map['Workers'];
-    if (wid !== undefined) {
-      freeze(wid); boldHeader(wid, 5);
-      dateFmt(wid, 3); numFmt(wid, 2, 3);
-      colW(wid,0,1,100); colW(wid,1,2,180); colW(wid,2,3,110); colW(wid,3,4,120); colW(wid,4,5,80);
-    }
-
-    // Labour
-    var lid = map['Labour'];
-    if (lid !== undefined) {
-      freeze(lid); boldHeader(lid, 6);
-      dateFmt(lid, 0); numFmt(lid, 4, 6);
-      colW(lid,0,1,110); colW(lid,1,2,180); colW(lid,2,3,110);
-      colW(lid,3,4,90);  colW(lid,4,5,110); colW(lid,5,6,110);
-    }
-
-    // Costs
-    var cid = map['Costs'];
-    if (cid !== undefined) {
-      freeze(cid); boldHeader(cid, 9);
-      dateFmt(cid, 0); numFmt(cid, 3, 6);
-      colW(cid,0,1,110); colW(cid,1,2,180); colW(cid,2,3,130);
-      colW(cid,3,4,110); colW(cid,4,5,110); colW(cid,5,6,130);
-      colW(cid,6,7,140); colW(cid,7,8,200); colW(cid,8,9,150);
-    }
-
-    // Payments
-    var pid = map['Payments'];
-    if (pid !== undefined) {
-      freeze(pid); boldHeader(pid, 6);
-      dateFmt(pid, 0); numFmt(pid, 3, 4);
-      colW(pid,0,1,110); colW(pid,1,2,180); colW(pid,2,3,110);
-      colW(pid,3,4,120); colW(pid,4,5,130); colW(pid,5,6,200);
-    }
-
-    // Dashboard
-    var did = map['Dashboard'];
-    if (did !== undefined) {
-      freeze(did); boldHeader(did, 2);
-      colW(did,0,1,240); colW(did,1,2,140);
-    }
+    });
 
     return reqs;
   }
