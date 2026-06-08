@@ -964,38 +964,36 @@ var Settings = {
   _buildFormatRequests: function (sheetMap) {
     var reqs = [];
 
-    // ── Colour palette ─────────────────────────────────────────
-    var NAVY   = { red: 0.118, green: 0.161, blue: 0.231 };  // #1e293b  header bg
-    var WHITE  = { red: 1,     green: 1,     blue: 1     };  // #ffffff  row 1, 3, 5…
-    var LGREY  = { red: 0.973, green: 0.980, blue: 0.988 };  // #f8fafc  row 2, 4, 6…
-    var DTEXT  = { red: 0.067, green: 0.094, blue: 0.153 };  // #111827  data text
-    var WTEXT  = { red: 1,     green: 1,     blue: 1     };  // #ffffff  header text
-    var BCLR   = { red: 0.878, green: 0.906, blue: 0.929 };  // #e0e7ed  cell borders
+    // ── Colours (modern ColorStyle API — plain Color objects are deprecated) ──────
+    // Wrap all RGB values in { rgbColor: {...} } so the Sheets API accepts them.
+    var NAVY_CS  = { rgbColor: { red: 0.118, green: 0.161, blue: 0.231 } }; // #1e293b
+    var WHITE_CS = { rgbColor: { red: 1,     green: 1,     blue: 1     } }; // #ffffff
+    var DTEXT_CS = { rgbColor: { red: 0.067, green: 0.094, blue: 0.153 } }; // #111827
+    var BORD_CS  = { rgbColor: { red: 0.878, green: 0.906, blue: 0.929 } }; // #e0e7ed
 
-    // ── Shared format atoms ─────────────────────────────────────
-    var THIN   = { style: 'SOLID', width: 1, color: BCLR };
+    // ── Shared atoms ─────────────────────────────────────────────────────────────
+    var THIN    = { style: 'SOLID', colorStyle: BORD_CS };
     var BORDERS = { top: THIN, bottom: THIN, left: THIN, right: THIN };
+
     var DATE_FMT = { type: 'DATE',   pattern: 'yyyy-mm-dd'  };
     var CURR_FMT = { type: 'NUMBER', pattern: '"R"#,##0.00' };
     var NUM_FMT  = { type: 'NUMBER', pattern: '#,##0.00'    };
-    var MAX_ROW  = 1000;   // apply data formatting this many rows down
+    var MAX_ROW  = 1000;
 
-    // ── Per-sheet schema ────────────────────────────────────────
-    // currRange: [startColIdx, endColIdx) for currency columns (right-align + R format)
-    // dateCols:  array of column indices with date format
+    // ── Per-sheet schema ──────────────────────────────────────────────────────────
     var SHEETS = [
-      { name: 'Workers',   cols: 5, dateCols: [3],    currRange: [2, 3]  },  // Daily Rate
-      { name: 'Labour',    cols: 6, dateCols: [0],    currRange: [4, 6]  },  // Daily Rate, Pay
-      { name: 'Costs',     cols: 9, dateCols: [0],    currRange: [3, 6]  },  // Ex VAT, VAT, Total
-      { name: 'Payments',  cols: 6, dateCols: [0],    currRange: [3, 4]  },  // Amount Paid
-      { name: 'Dashboard', cols: 2, dateCols: [],     currRange: [1, 2]  }   // Value
+      { name: 'Workers',   cols: 5, dateCols: [3],    currRange: [2, 3] },
+      { name: 'Labour',    cols: 6, dateCols: [0],    currRange: [4, 6] },
+      { name: 'Costs',     cols: 9, dateCols: [0],    currRange: [3, 6] },
+      { name: 'Payments',  cols: 6, dateCols: [0],    currRange: [3, 4] },
+      { name: 'Dashboard', cols: 2, dateCols: [],     currRange: [1, 2] }
     ];
 
     SHEETS.forEach(function (s) {
       var sid = sheetMap[s.name];
       if (sid === undefined) return;
       var nc = s.cols;
-      var cr = s.currRange;   // [start, end)
+      var cr = s.currRange;
 
       // 1. Freeze header row
       reqs.push({ updateSheetProperties: {
@@ -1003,54 +1001,38 @@ var Settings = {
         fields: 'gridProperties.frozenRowCount'
       }});
 
-      // 2. Header row ONLY (row index 0):
-      //    dark navy bg · white bold text · left-aligned · no borders needed
+      // 2. HEADER ROW ONLY (row 0 — endRowIndex:1 means ONLY row 0, never data rows).
+      //    Navy background + white bold text.
       reqs.push({ repeatCell: {
         range: { sheetId: sid, startRowIndex: 0, endRowIndex: 1,
                  startColumnIndex: 0, endColumnIndex: nc },
         cell: { userEnteredFormat: {
-          backgroundColor: NAVY,
-          textFormat: { bold: true, foregroundColor: WTEXT, fontSize: 10 },
+          backgroundColorStyle: NAVY_CS,
+          textFormat: { bold: true, fontSize: 11, foregroundColorStyle: { rgbColor: { red: 1, green: 1, blue: 1 } } },
           horizontalAlignment: 'LEFT',
-          verticalAlignment:   'MIDDLE',
-          padding: { top: 8, bottom: 8, left: 10, right: 10 }
+          verticalAlignment:   'MIDDLE'
         }},
-        fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment,padding)'
+        fields: 'userEnteredFormat(backgroundColorStyle,textFormat,horizontalAlignment,verticalAlignment)'
       }});
 
-      // 3. ALL data rows (1 → MAX_ROW): explicit white bg + dark text + borders + left-align.
-      //    This clears any stale navy from a previous broken run on every data cell.
+      // 3. ALL DATA ROWS (1 → MAX_ROW).
+      //    Explicitly sets white background + dark text on every data cell.
+      //    This is the critical reset — it overwrites any stale navy from previous runs.
+      //    NO banding is used; banding was removed because it conflicts with per-cell bg.
       reqs.push({ repeatCell: {
         range: { sheetId: sid, startRowIndex: 1, endRowIndex: MAX_ROW,
                  startColumnIndex: 0, endColumnIndex: nc },
         cell: { userEnteredFormat: {
-          backgroundColor:    WHITE,
-          textFormat:         { bold: false, foregroundColor: DTEXT, fontSize: 10 },
-          horizontalAlignment:'LEFT',
-          verticalAlignment:  'MIDDLE',
-          borders:             BORDERS,
-          padding:             { top: 4, bottom: 4, left: 10, right: 10 }
+          backgroundColorStyle: WHITE_CS,
+          textFormat: { bold: false, fontSize: 10, foregroundColorStyle: DTEXT_CS },
+          horizontalAlignment: 'LEFT',
+          verticalAlignment:   'MIDDLE',
+          borders: BORDERS
         }},
-        fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment,borders,padding)'
+        fields: 'userEnteredFormat(backgroundColorStyle,textFormat,horizontalAlignment,verticalAlignment,borders)'
       }});
 
-      // 4. Alternating row banding on data rows.
-      //    Banding renders ON TOP of per-cell background in the Sheets rendering stack,
-      //    so odd rows show WHITE (overriding step 3's white — same colour, no change)
-      //    and even rows show LGREY (overriding step 3's white — shows grey). ✓
-      //    Step 3 still matters: it resets any stale navy on rows where banding has no effect
-      //    (e.g. if MAX_ROW extends beyond the banded range's rendered rows).
-      reqs.push({ addBanding: {
-        bandedRange: {
-          range: { sheetId: sid, startRowIndex: 1, startColumnIndex: 0, endColumnIndex: nc },
-          rowProperties: {
-            firstBandColor:  WHITE,   // rows 1, 3, 5 … (odd data rows)
-            secondBandColor: LGREY    // rows 2, 4, 6 … (even data rows)
-          }
-        }
-      }});
-
-      // 5. Date columns: yyyy-mm-dd format
+      // 4. Date columns: yyyy-mm-dd
       s.dateCols.forEach(function (col) {
         reqs.push({ repeatCell: {
           range: { sheetId: sid, startRowIndex: 1, endRowIndex: MAX_ROW,
@@ -1060,20 +1042,20 @@ var Settings = {
         }});
       });
 
-      // 6. Currency columns: "R"#,##0.00 format + right-aligned
+      // 5. Currency columns: R#,##0.00 + right-aligned
       if (cr[0] < cr[1]) {
         reqs.push({ repeatCell: {
           range: { sheetId: sid, startRowIndex: 1, endRowIndex: MAX_ROW,
                    startColumnIndex: cr[0], endColumnIndex: cr[1] },
           cell: { userEnteredFormat: {
-            numberFormat:        CURR_FMT,
+            numberFormat: CURR_FMT,
             horizontalAlignment: 'RIGHT'
           }},
-          fields: 'userEnteredFormat(numberFormat,horizontalAlignment)'
+          fields: 'userEnteredFormat.numberFormat,userEnteredFormat.horizontalAlignment'
         }});
       }
 
-      // 7. Dashboard Value column uses plain number format (it holds both currency and counts)
+      // 6. Dashboard value column: plain number (holds amounts and integer counts)
       if (s.name === 'Dashboard') {
         reqs.push({ repeatCell: {
           range: { sheetId: sid, startRowIndex: 1, endRowIndex: MAX_ROW,
@@ -1083,7 +1065,7 @@ var Settings = {
         }});
       }
 
-      // 8. Auto-resize all columns to fit content
+      // 7. Auto-resize columns
       reqs.push({ autoResizeDimensions: {
         dimensions: { sheetId: sid, dimension: 'COLUMNS', startIndex: 0, endIndex: nc }
       }});
