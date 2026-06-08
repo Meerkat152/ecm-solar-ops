@@ -557,10 +557,11 @@ function normalizeDate(v) {
   if (m1) {
     return m1[3] + '-' + m1[2].padStart(2,'0') + '-' + m1[1].padStart(2,'0');
   }
-  // Sheets serial number (integer days since 30-Dec-1899)
-  if (/^\d+$/.test(s)) {
-    var serial = parseInt(s, 10);
-    var epoch  = new Date((serial - 25569) * 86400000);
+  // Sheets serial number — integer OR float (e.g. 46175 or 46175.0).
+  // UNFORMATTED_VALUE returns dates as JS numbers; String(46175) = "46175".
+  if (/^\d+(\.\d+)?$/.test(s)) {
+    var serial = parseFloat(s);
+    var epoch  = new Date(Math.round(serial - 25569) * 86400000);
     return localIsoDate(epoch);
   }
   return s;
@@ -651,7 +652,12 @@ var GApi = {
     });
   },
   getRange: function (sid, range) {
-    return this.request('GET', 'https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(range));
+    // UNFORMATTED_VALUE returns raw numbers (e.g. 1800) not display strings (e.g. "R1,800.00").
+    // Without this, currency-formatted cells return their display text and parseFloat() gives 0.
+    return this.request('GET',
+      'https://sheets.googleapis.com/v4/spreadsheets/' + sid +
+      '/values/' + encodeURIComponent(range) +
+      '?valueRenderOption=UNFORMATTED_VALUE');
   },
   appendRows: function (sid, range, values) {
     return this.request('POST',
@@ -1141,7 +1147,7 @@ var Labour = {
     GApi.getRange(sid, 'Workers!A:E').then(function (res) {
       var rows = (res.values || []).slice(1);
       Labour.workers = rows
-        .filter(function (r) { return r[1] && r[4] !== 'FALSE'; })
+        .filter(function (r) { return r[1] && r[4] !== 'FALSE' && r[4] !== false; })
         .map(function (r) {
           return { id: r[0] || '', name: r[1] || '',
                    rate: parseFloat(r[2]) || parseFloat(State.get('dailyRate', '1800')) };
@@ -1696,7 +1702,7 @@ var Dashboard = {
 
       var totalSpend    = totalLabour + totalCostsExVat;
       var totalIncVat   = totalSpend + totalVat;
-      var activeWorkers = workerRows.filter(function (r) { return r[4] !== 'FALSE'; }).length;
+      var activeWorkers = workerRows.filter(function (r) { return r[4] !== 'FALSE' && r[4] !== false; }).length;
       var daysCount     = Object.keys(uniqueDays).length;
 
       document.getElementById('ds-spend').innerHTML    = fmtR(totalSpend);
